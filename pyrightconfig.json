@@ -1,0 +1,9 @@
+{
+    "exclude": [".venv"],
+    "reportShadowedImports": false,
+    "pythonVersion": "3.11",
+    "venv": ".venv",
+    "venvPath": ".",
+    "typeCheckingMode": "basic",
+    "stubPath": ""
+}

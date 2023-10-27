@@ -1,0 +1,20 @@
+[project]
+name = "ryanvk"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "GreyElaina", email = "GreyElaina@outlook.com"},
+]
+dependencies = []
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "ruff>=0.1.3",
+]
