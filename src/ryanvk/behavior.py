@@ -20,10 +20,11 @@ P = ParamSpec("P")
 
 class OverloadBehavior:
     def harvest_record(self, staff: Staff, fn: Fn) -> FnRecord:
-        result = staff.artifact_map.get(FnImplement(fn))
-        if result is None:
+        sign = FnImplement(fn)
+        if sign not in staff.artifact_map:
             raise NotImplementedError
-        return result
+
+        return staff.artifact_map[sign]
 
     def harvest_overload(
         self, staff: Staff, fn: Fn[P, R], *args: P.args, **kwargs: P.kwargs
@@ -40,11 +41,10 @@ class OverloadBehavior:
                 entities = overload_item.get_entities(
                     scope, {i: bound_args.arguments[i] for i in required_args}
                 )
-                collections = (
-                    entities
-                    if collections is None
-                    else collections.intersection(entities)
-                )
+                if collections is None:
+                    collections = entities
+                else:
+                    collections.intersection_update(entities)
 
             if not collections:
                 raise NotImplementedError
