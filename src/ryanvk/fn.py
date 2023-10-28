@@ -4,6 +4,7 @@ import inspect
 from typing import TYPE_CHECKING, Any, Callable, Generic, TypedDict, overload
 
 from typing_extensions import Concatenate, ParamSpec, Self, TypeVar
+from ryanvk.entity import BaseEntity
 
 from ryanvk.sign import FnImplement
 
@@ -39,7 +40,7 @@ class FnCollectRecord(TypedDict):
     record_tuple: tuple[BaseCollector, Callable] | None
 
 
-class Fn(Generic[P, R]):
+class Fn(Generic[P, R], BaseEntity):
     owner: type[BasePerform | Capability]  # TODO: review here
     name: str
 
@@ -121,6 +122,8 @@ class Fn(Generic[P, R]):
         collector: BaseCollector,
         **overload_settings: Any,
     ):
+        super().collect(collector)
+
         def wrapper(
             entity: Callable[Concatenate[Any, P], R]
         ) -> Callable[Concatenate[Any, P], R]:
