@@ -38,9 +38,6 @@ class BaseCollector:
 
         return LocalPerformTemplate
 
-    def collect(self, signature: Any, artifact: Any):
-        self.artifacts[signature] = artifact
-
     def on_collected(self, func: Callable[[type], Any]):
         self.collected_callbacks.append(func)
 

@@ -5,6 +5,7 @@ from typing import TypedDict, NotRequired, Any
 from ryanvk.collector import BaseCollector
 from ryanvk.perform import BasePerform
 
+
 class EntityAssignInfo(TypedDict):
     name: NotRequired[str]
     annotation: NotRequired[Any]

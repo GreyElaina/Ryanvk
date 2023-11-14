@@ -2,18 +2,22 @@ from __future__ import annotations
 
 from collections import ChainMap
 from contextlib import AsyncExitStack, asynccontextmanager
+from contextvars import ContextVar
 from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Protocol, TypeVar, overload
 
 from typing_extensions import ParamSpec
 
+from ryanvk.utilles import standalone_context
+
 if TYPE_CHECKING:
-    from .fn import Fn
     from .perform import BasePerform
 
 P = ParamSpec("P")
 R = TypeVar("R", covariant=True)
 VnCallable = TypeVar("VnCallable", bound=Callable)
+
+_CurrentIterStack = ContextVar[list[int]]("_CurrentIterStack")
 
 
 class Staff:
@@ -31,10 +35,6 @@ class Staff:
         self.components = components
         self.exit_stack = AsyncExitStack()
         self.instances = {}
-
-    def call_fn(self, fn: Fn[P, R], *args: P.args, **kwargs: P.kwargs) -> R:
-        collector, entity = fn.behavior.harvest_overload(self, fn, *args, **kwargs)
-        return fn.execute(self, collector, entity, *args, **kwargs)
 
     class PostInitShape(Protocol[P]):
         def __post_init__(self, *args: P.args, **kwargs: P.kwargs) -> Any:
@@ -68,8 +68,21 @@ class Staff:
         instance.components.update(components)
         return instance
 
-    def get_fn_call(self, fn: Fn[P, R]) -> Callable[P, R]:
-        def wrapper(*args: P.args, **kwargs: P.kwargs):
-            return self.call_fn(fn, *args, **kwargs)
+    @standalone_context
+    def iter_artifacts(self):
+        stack = _CurrentIterStack.get(None)
+        if stack is None:
+            stack = [-1]
+            _CurrentIterStack.set(stack)
 
-        return wrapper
+        index = stack[-1]
+        stack.append(index)
+
+        start_offset = index + 1
+        try:
+            for stack[-1], content in enumerate(
+                self.artifact_collections[start_offset:], start=start_offset
+            ):
+                yield content
+        finally:
+            stack.pop()

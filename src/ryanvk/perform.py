@@ -3,8 +3,6 @@ from __future__ import annotations
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from .endpoint import Endpoint
-
 if TYPE_CHECKING:
     from ryanvk.staff import Staff
 
@@ -33,15 +31,11 @@ class BasePerform:
     def apply_to(cls, map: dict[Any, Any]):
         map.update(cls.__collector__.artifacts)
 
-    @classmethod
-    def endpoints(cls):
-        return [(k, v) for k, v in cls.__dict__.items() if isinstance(v, Endpoint)]
-
     @asynccontextmanager
     async def lifespan(self):
         async with AsyncExitStack() as stack:
-            for _, v in self.endpoints():
-                await stack.enter_async_context(v.lifespan(self))
+            # TODO: entity lifespan manage entry
+            # 设计中，所有的 Perform 都需要在 Staff 中预先通过 maintain 获取实例；可以预先初始化一些给 Staff 用。
             yield self
 
     @classmethod

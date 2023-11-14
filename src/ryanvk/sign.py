@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Any, Callable, TypedDict
 from typing_extensions import ParamSpec, TypeVar
 
 if TYPE_CHECKING:
-    from .fn import Fn
-    from .overload import FnOverload
+    from .fn.base import Fn
+    # from .overload import FnOverload
 
 
 P = ParamSpec("P")
@@ -18,10 +18,11 @@ P1 = ParamSpec("P1")
 P2 = ParamSpec("P2")
 R2 = TypeVar("R2", covariant=True)
 
-
+"""
 class _MergeScopesInfo(TypedDict):
     overload_item: FnOverload
     scopes: list[dict[Any, Any]]
+"""
 
 
 class FnRecord(TypedDict):
@@ -34,6 +35,7 @@ class FnRecord(TypedDict):
 class FnImplement:
     fn: Fn
 
+    """
     def merge(self, *records: FnRecord):
         scopes_info: dict[str, _MergeScopesInfo] = {}
         scopes = {}
@@ -55,3 +57,4 @@ class FnImplement:
             "overload_scopes": scopes,
             "record_tuple": records[-1]["record_tuple"],
         }
+    """

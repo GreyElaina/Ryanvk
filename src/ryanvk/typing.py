@@ -1,12 +1,35 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, Protocol, Union, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Protocol,
+    TypeVar,
+    TYPE_CHECKING,
+    runtime_checkable,
+    Generator,
+)
+from typing_extensions import ParamSpec, TypeAlias
 
-from typing_extensions import ParamSpec, TypeVar
+if TYPE_CHECKING:
+    from ryanvk.collector import BaseCollector
+    from ryanvk.fn.record import FnOverloadHarvest
 
+T = TypeVar("T")
+R = TypeVar("R", covariant=True)
 P = ParamSpec("P")
-R = TypeVar("R", infer_variance=True)
+P1 = ParamSpec("P1")
+
+T1 = TypeVar("T1")
+T2 = TypeVar("T2")
+
+inP = ParamSpec("inP")
+outP = ParamSpec("outP")
+inR = TypeVar("inR", covariant=True)
+outR = TypeVar("outR", covariant=True)
+
+inRC = TypeVar("inRC", covariant=True, bound=Callable)
+inTC = TypeVar("inTC", bound=Callable)
 
 
 class SupportsCollect(Protocol[P, R]):
@@ -18,3 +41,14 @@ class SupportsCollect(Protocol[P, R]):
 class SupportsMerge(Protocol):
     def merge(self, *records: dict):
         ...
+
+
+class CallShape(Protocol[P, R]):
+    def call(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        ...
+
+
+Twin: TypeAlias = "tuple[BaseCollector, Any]"
+
+FnComposeCollectReturnType = Generator[FnOverloadHarvest, Any, None]
+FnComposeCallReturnType = Generator[FnOverloadHarvest, set[Twin], R]
