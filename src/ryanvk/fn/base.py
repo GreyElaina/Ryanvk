@@ -13,14 +13,7 @@ if TYPE_CHECKING:
 K = TypeVar("K")
 
 
-class FnMethodComposeCls(
-    Protocol[
-        outP,
-        outR,
-        inP,
-        inR,
-    ]
-):
+class FnMethodComposeCls(Protocol[outP, outR, inP, inR]):
     def call(
         self, *args: outP.args, **kwargs: outP.kwargs
     ) -> FnComposeCallReturnType[outR]:
@@ -54,8 +47,6 @@ class Fn(Generic[P, R, K], BaseEntity):
     ):
         return cls(compose_cls)  # type: ignore
 
-    # 重写为 Fn.implements，在 FnImplementEntity 里。
-
     def implements(self: Fn[P, R, Callable[inP, inTC]], impl: inTC):
         return FnImplementEntity(self, impl)
 
@@ -73,7 +64,10 @@ class Fn(Generic[P, R, K], BaseEntity):
         if not record["overload_enabled"]:
             assert record["legecy_slot"] is not None
             collector, entity = record["legecy_slot"]
-            instance = staff.instances[collector.cls]  # TODO: new instance maintain
+            if collector.cls.__static__:
+                instance = collector.cls(staff)
+            else:
+                instance = staff.instances[collector.cls]  # TODO: new instance maintain
             return entity(instance, *args, **kwargs)
 
         token = _StaffCtx.set(staff)
