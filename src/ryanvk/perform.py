@@ -113,8 +113,8 @@ def namespace_generate(*, warn_for_accident_declare: bool = True):
                 if not i.__collector__.upstream_target and i not in manually:
                     warnings.warn(
                         f'{i.__name__} does not use the "upstream_target = True" setting.'
-                        'It may have been imported accidentally or not yielded by this generator.'
-                        'Both scenarios are likely unintended. Please have a developer review this.',
+                        "It may have been imported accidentally or not yielded by this generator."
+                        "Both scenarios are likely unintended. Please have a developer review this.",
                         ImportWarning,
                     )
 

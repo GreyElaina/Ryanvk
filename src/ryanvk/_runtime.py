@@ -4,4 +4,3 @@ from typing import MutableMapping, Any
 
 targets_artifact_map: ContextVar[MutableMapping[Any, Any]]\
     = ContextVar("targets_artifact_map")  # fmt: off
-
