@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from contextlib import AbstractContextManager
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
-
+from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
+from ._runtime import targets_artifact_map
 from .perform import BasePerform
 
 if TYPE_CHECKING:
@@ -12,8 +12,21 @@ T = TypeVar("T")
 
 
 class BaseCollector:
-    artifacts: dict[Any, Any]
+    artifacts: MutableMapping[Any, Any]
     collected_callbacks: list[Callable[[type[BasePerform]], Any]]
+
+    _upstream_target: bool = False
+
+    @property
+    def upstream_target(self):
+        return self._upstream_target
+
+    @upstream_target.setter
+    def _upstream_target_setter(self, value: bool):
+        self._upstream_target = value
+
+        if value:
+            self.artifacts = targets_artifact_map.get(None) or {}
 
     def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
         self.artifacts = artifacts or {}
@@ -24,7 +37,7 @@ class BaseCollector:
 
     @property
     def _(self):
-        class LocalPerformTemplate(BasePerform, native=True):
+        class LocalPerformTemplate(BasePerform, keep_native=True):
             __collector__ = self
 
         return LocalPerformTemplate
