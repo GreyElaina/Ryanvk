@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Protocol, TypeVar, Generic, Any
+from typing import TYPE_CHECKING, Callable, Concatenate, Protocol, TypeVar, Generic, Any
 
 from ryanvk.entity import BaseEntity
-from ryanvk.fn.compose import FnCompose, _StaffCtx
+from ryanvk.fn.compose import FnCompose, _StaffCtx, EntitiesHarvest
 from ryanvk.fn.entity import FnImplementEntity
 from ryanvk.fn.record import FnRecord
 from ryanvk.typing import P, R, inP, outP, inR, outR, FnComposeCallReturnType, inTC
@@ -33,12 +33,16 @@ class Fn(Generic[P, R, K], BaseEntity):
     def __init__(self, compose_cls: type[FnCompose]):
         self.compose_instance = compose_cls(self)
 
-    """
+    
     # TODO: Fn.symmetric based on Compose.
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
-        return cls()
-    """
+        class LocalCompose(Generic[outP, outR], FnCompose):
+            def call(self) -> FnComposeCallReturnType[Any]:
+                ...
+
+        return cls(LocalCompose)
+    
 
     @classmethod
     def compose(
@@ -64,21 +68,33 @@ class Fn(Generic[P, R, K], BaseEntity):
         if not record["overload_enabled"]:
             assert record["legecy_slot"] is not None
             collector, entity = record["legecy_slot"]
+
+            """
             if collector.cls.__static__:
                 instance = collector.cls(staff)
             else:
                 instance = staff.instances[collector.cls]  # TODO: new instance maintain
+            """
+
+            # FIXME: 仅供调试使用。
+
+            if collector.cls not in staff.instances:  # TODO: new instance maintain
+                instance = staff.instances[collector.cls] = collector.cls(staff)
+            else:
+                instance = staff.instances[collector.cls]
+
             return entity(instance, *args, **kwargs)
 
         token = _StaffCtx.set(staff)
         try:
             iters = define.compose_instance.call(*args, **kwargs)
-
-            harvest = next(iters)
+            harvest_info = next(iters)
+            harv = EntitiesHarvest.mutation_endpoint.get()
             while True:
-                scope = record["overload_scopes"][harvest.name]
-                overload_ = harvest.overload
-                harvest = iters.send(overload_.harvest(scope, harvest.value))
+                scope = record["overload_scopes"][harvest_info.name]
+                stage = harvest_info.overload.harvest(scope, harvest_info.value)
+                harv.commit(stage)
+                harvest_info = next(iters)
 
         except StopIteration as e:
             return e.value

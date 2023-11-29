@@ -24,7 +24,6 @@ class FnRecord(TypedDict):
 class FnImplement(PileTopic[FnRecord, tuple[tuple[str, 'FnOverload', Any], ...], Twin]):
     fn: Fn
 
-    # TODO: new merge
     def iter_entities(
         self, record: FnRecord
     ) -> MutableMapping[frozenset[tuple[str, 'FnOverload', Any]] | None, Twin]:
@@ -74,6 +73,7 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, 'FnOverload', Any], ...],
 
 
 # TODO: 弃用 Harvest，因为让我很烦。
+# 只要只是在 ExtControl 和 Call/Collect Body 之间传递就好，先 make it work.
 @dataclass(eq=True, frozen=True)
 class FnOverloadHarvest:
     name: str

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Generic, TypeVar, TYPE_CHECKING, overload
+from typing import Any, Callable, Generic, Sequence, TypeVar, TYPE_CHECKING, overload
 from typing_extensions import Self
 from ryanvk.collector import BaseCollector
 from ryanvk.fn.record import FnOverloadHarvest
@@ -26,7 +26,7 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
 
     def harvest(
         self, scope: dict, value: TCallValue
-    ) -> set[tuple[BaseCollector, Callable]]:
+    ) -> Sequence[tuple[BaseCollector, Callable]]:
         return scope[value]
 
     def as_agent(self):

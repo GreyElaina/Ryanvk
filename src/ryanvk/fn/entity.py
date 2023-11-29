@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Generic, Any, overload, cast
+from contextvars import ContextVar
+from typing import TYPE_CHECKING, Callable, ClassVar, Generic, Any, overload, cast
 from typing_extensions import Self
 from ryanvk.collector import BaseCollector
 
