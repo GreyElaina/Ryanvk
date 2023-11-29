@@ -80,12 +80,23 @@ def _gen_subclass(cls: type[_T]) -> Generator[type[_T], None, None]:
         yield from _gen_subclass(sub_cls)
 
 
-def namespace_generate(*, warn_for_accident_declare: bool = True):
+def namespace_generate(
+    *,
+    warning: bool = True,
+    warn_for_accident_declare: bool = True,
+    warn_for_non_static: bool = True
+):
     """
     NOTE
-        *warn_for_accident_declare* 应在发布时**有把握的**被关闭，以降低在用户侧运行时整体应用的启动负担，
-        在平时开发时应该尽可能的开启这个设置，扫描可能被 import 引入，却没有被自动导入 namespace 的 Perform，
-        也即，被设计为在默认情况下，可能无意中使用了 `m.upstream_target = False` 的 Perform。
+        *warning* 应在发布时**有把握的**被关闭，以降低在用户侧运行时整体应用的启动负担，在平时开发时则应尽可能的开启这个设置。
+
+        *warn_for_accident_declare* 扫描可能被 import 引入，却没有被自动导入至 namespace 的 Perform，
+        也即，被设计为在默认情况下，可能无意中使用了 `m.upstream_target = False` 设定的 Perform。
+
+        *warn_for_non_static* 扫描声明了 static=False ，也即使用了 Perform 生命周期特性的项，
+        在现有的约定中，属于协议实现的 Perform 不应该声明局部生命周期资源，这会带来非必要的负担，
+        请使用 launart 提供的 Service、Broadcast Control 提供的生命周期钩子或是其他能提供等效形式的方法实现
+        （通常可以达到同等或超出的效果），再使用 mountpoint handler 暴露给 Ryanvk World 访问。
     """
 
     def wrapper(func: Callable[[], None | Generator[type[BasePerform], None, Any]]):
@@ -94,7 +105,7 @@ def namespace_generate(*, warn_for_accident_declare: bool = True):
         token = targets_artifact_map.set(namespace)
 
         before = None
-        if warn_for_accident_declare:
+        if warning:
             before = list(_gen_subclass(BasePerform))[1:]
 
         try:
@@ -110,12 +121,27 @@ def namespace_generate(*, warn_for_accident_declare: bool = True):
                 if i.__native__:
                     continue
 
-                if not i.__collector__.upstream_target and i not in manually:
+                if (
+                    warn_for_accident_declare
+                    and not i.__collector__.upstream_target
+                    and i not in manually
+                ):
                     warnings.warn(
-                        f'{i.__name__} does not use the "upstream_target = True" setting.'
+                        f'{i.__module__}:{i.__name__} does not use the "upstream_target = True" setting.'
                         "It may have been imported accidentally or not yielded by this generator."
                         "Both scenarios are likely unintended. Please have a developer review this.",
                         ImportWarning,
+                    )
+                
+                if warn_for_non_static and not i.__static__:
+                    warnings.warn(
+                        f"{i.__module__}:{i.__name__} declares (m := ..., static=False), "
+                        "which enabled perform lifespan feature."
+                        "It means ALL resources depends on lifespan feature WILL NOT WORKING, "
+                        "because namespace_generate won't record these performs to be ensured "
+                        "then Staff won't handle these performs. This behavior is designed currently. "
+                        "Please have a developer review this.",
+                        ImportWarning
                     )
 
         return namespace
