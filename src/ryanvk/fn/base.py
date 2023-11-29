@@ -52,7 +52,7 @@ class Fn(Generic[P, R, K], BaseEntity):
 
     def call(self, staff: Staff, *args: P.args, **kwargs: P.kwargs) -> R:
         signature = self.compose_instance.signature()
-        for artifacts in staff.iter_artifacts():
+        for artifacts in staff.iter_artifacts(signature):
             if signature in artifacts:
                 break
         else:
@@ -78,8 +78,7 @@ class Fn(Generic[P, R, K], BaseEntity):
             while True:
                 scope = record["overload_scopes"][harvest.name]
                 overload_ = harvest.overload
-                overload_sign = overload_.signature_from_call_value(harvest.value)
-                harvest = iters.send(overload_.harvest(scope, overload_sign))
+                harvest = iters.send(overload_.harvest(scope, harvest.value))
 
         except StopIteration as e:
             return e.value

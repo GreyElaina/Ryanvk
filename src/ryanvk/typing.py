@@ -52,3 +52,4 @@ Twin: TypeAlias = "tuple[BaseCollector, Any]"
 
 FnComposeCollectReturnType = Generator[FnOverloadHarvest, Any, None]
 FnComposeCallReturnType = Generator[FnOverloadHarvest, set[Twin], R]
+# TODO 放弃 Harvest，直接向上调用。

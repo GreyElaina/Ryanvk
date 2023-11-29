@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Generic, Any, overload
+from typing import TYPE_CHECKING, Callable, Generic, Any, overload, cast
 from typing_extensions import Self
 from ryanvk.collector import BaseCollector
 
@@ -12,7 +12,7 @@ from ryanvk.typing import P, R, inP, inRC
 from ryanvk.perform import BasePerform
 
 if TYPE_CHECKING:
-    ...
+    from ryanvk.fn.overload import FnOverload
 
 
 class FnImplementEntity(Generic[P, R, K], BaseEntity):
@@ -37,26 +37,33 @@ class FnImplementEntity(Generic[P, R, K], BaseEntity):
 
         overload_enabled = type(self.fn.compose_instance).collect is FnCompose.collect
         record_signature = self.fn.compose_instance.signature()
-        record: FnRecord = collector.artifacts.setdefault(
-            record_signature,
-            {
+        if record_signature not in collector.artifacts:
+            record = collector.artifacts[record_signature] = cast('FnRecord', {
                 "define": self,
                 "overload_enabled": overload_enabled,
                 "overload_scopes": {},
                 "legecy_slot": None,
-            },
-        )
+                "entities": {}
+            })
+        else:
+            record = collector.artifacts[record_signature]
+
         overload_scopes = record["overload_scopes"]
         twin = (collector, self.impl)
 
         if not overload_enabled:
             record["legecy_slot"] = twin  # type: ignore
             return self
+        
+        triples: set[tuple[str, FnOverload, Any]] = set()
 
         for harvest_info in self.fn.compose_instance.collect(*args, **kwargs):
-            sign = harvest_info.overload.signature_from_call_value(harvest_info.value)
+            sign = harvest_info.overload.signature_from_collect(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             harvest_info.overload.collect(scope, sign, twin)
+            triples.add((harvest_info.name, harvest_info.overload, sign))
+
+        record['entities'][frozenset(triples)] = twin
 
         return self
 

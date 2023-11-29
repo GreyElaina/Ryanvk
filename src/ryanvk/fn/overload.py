@@ -18,9 +18,6 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
     def __init__(self) -> None:
         ...
 
-    def signature_from_call_value(self, call_value: TCallValue) -> TSignature:
-        return call_value  # type: ignore
-
     def signature_from_collect(self, collect_value: TCollectValue) -> TSignature:
         return collect_value  # type: ignore
 
@@ -28,9 +25,9 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
         scope[signature] = twin
 
     def harvest(
-        self, scope: dict, signature: TSignature
+        self, scope: dict, value: TCallValue
     ) -> set[tuple[BaseCollector, Callable]]:
-        return scope[signature]
+        return scope[value]
 
     def as_agent(self):
         return FnOverloadAgentDescriptor(self)

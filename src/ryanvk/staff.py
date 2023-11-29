@@ -17,7 +17,7 @@ P = ParamSpec("P")
 R = TypeVar("R", covariant=True)
 VnCallable = TypeVar("VnCallable", bound=Callable)
 
-_CurrentIterStack = ContextVar[list[int]]("_CurrentIterStack")
+_iter_stack_collection = ContextVar[dict[Any, list[int]]]("_CurrentIterStack")
 
 
 class Staff:
@@ -69,11 +69,16 @@ class Staff:
         return instance
 
     @standalone_context
-    def iter_artifacts(self):
-        stack = _CurrentIterStack.get(None)
-        if stack is None:
+    def iter_artifacts(self, key: Any | None = None):
+        collection = _iter_stack_collection.get(None)
+        if collection is None:
             stack = [-1]
-            _CurrentIterStack.set(stack)
+            _iter_stack_collection.set({key: stack})
+        else:
+            if key not in collection:
+                collection[key] = [-1]
+
+            stack = collection[key]
 
         index = stack[-1]
         stack.append(index)
