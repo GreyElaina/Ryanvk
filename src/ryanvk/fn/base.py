@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Concatenate, Protocol, TypeVar, Generic, Any
+
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, TypeVar
 
 from ryanvk.entity import BaseEntity
-from ryanvk.fn.compose import FnCompose, _StaffCtx, EntitiesHarvest
+from ryanvk.fn.compose import EntitiesHarvest, FnCompose
+from ryanvk._runtime import _upstream_staff
 from ryanvk.fn.entity import FnImplementEntity
 from ryanvk.fn.record import FnRecord
-from ryanvk.typing import P, R, inP, outP, inR, outR, FnComposeCallReturnType, inTC
+from ryanvk.typing import FnComposeCallReturnType, P, R, inP, inR, inTC, outP, outR
 
 if TYPE_CHECKING:
     from ryanvk.staff import Staff
@@ -33,7 +35,6 @@ class Fn(Generic[P, R, K], BaseEntity):
     def __init__(self, compose_cls: type[FnCompose]):
         self.compose_instance = compose_cls(self)
 
-    
     # TODO: Fn.symmetric based on Compose.
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
@@ -42,7 +43,6 @@ class Fn(Generic[P, R, K], BaseEntity):
                 ...
 
         return cls(LocalCompose)
-    
 
     @classmethod
     def compose(
@@ -78,14 +78,14 @@ class Fn(Generic[P, R, K], BaseEntity):
 
             # FIXME: 仅供调试使用。
 
-            if collector.cls not in staff.instances:  # TODO: new instance maintain
+            if collector.cls not in staff.instances:
                 instance = staff.instances[collector.cls] = collector.cls(staff)
             else:
                 instance = staff.instances[collector.cls]
 
             return entity(instance, *args, **kwargs)
 
-        token = _StaffCtx.set(staff)
+        token = _upstream_staff.set(staff)
         try:
             iters = define.compose_instance.call(*args, **kwargs)
             harvest_info = next(iters)
@@ -99,4 +99,4 @@ class Fn(Generic[P, R, K], BaseEntity):
         except StopIteration as e:
             return e.value
         finally:
-            _StaffCtx.reset(token)
+            _upstream_staff.reset(token)

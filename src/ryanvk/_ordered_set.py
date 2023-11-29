@@ -41,7 +41,6 @@ from typing import (
     MutableSet,
     AbstractSet,
     Sequence,
-    Set,
     TypeVar,
     Union,
     overload,
@@ -520,9 +519,9 @@ class OrderedSet(MutableSet[T], Sequence[T]):
             >>> print(this)
             OrderedSet([3, 5])
         """
-        items_to_remove = set()  # type: Set[T]
+        items_to_remove: set[T] = set()
         for other in sets:
-            items_as_set = set(other)  # type: Set[T]
+            items_as_set: set[T] = set(other)
             items_to_remove |= items_as_set
         self._update_items([item for item in self.items if item not in items_to_remove])
 

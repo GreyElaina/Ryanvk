@@ -4,6 +4,7 @@ from typing import MutableMapping, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .manager import MountpointProvider, LifespanManager
+    from .staff import Staff
 
 targets_artifact_map: ContextVar[MutableMapping[Any, Any]]\
     = ContextVar("targets_artifact_map")  # fmt: off
@@ -15,3 +16,6 @@ mountpoint_provider: ContextVar[MountpointProvider]\
 
 perform_manager: ContextVar[LifespanManager]\
     = ContextVar("perform_manager")  # fmt: off
+
+_upstream_staff: ContextVar[Staff]\
+    = ContextVar("_StaffCtx")  # fmt: off

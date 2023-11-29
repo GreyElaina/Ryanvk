@@ -84,7 +84,7 @@ def namespace_generate(
     *,
     warning: bool = True,
     warn_for_accident_declare: bool = True,
-    warn_for_non_static: bool = True
+    warn_for_non_static: bool = True,
 ):
     """
     NOTE
@@ -132,7 +132,7 @@ def namespace_generate(
                         "Both scenarios are likely unintended. Please have a developer review this.",
                         ImportWarning,
                     )
-                
+
                 if warn_for_non_static and not i.__static__:
                     warnings.warn(
                         f"{i.__module__}:{i.__name__} declares (m := ..., static=False), "
@@ -141,7 +141,7 @@ def namespace_generate(
                         "because namespace_generate won't record these performs to be ensured "
                         "then Staff won't handle these performs. This behavior is designed currently. "
                         "Please have a developer review this.",
-                        ImportWarning
+                        ImportWarning,
                     )
 
         return namespace

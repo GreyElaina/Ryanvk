@@ -1,26 +1,34 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import Any, TYPE_CHECKING, Callable, ClassVar, Generator, Generic, Iterable, Self, Sequence
 from contextvars import ContextVar
-
-from ryanvk.fn.record import FnImplement
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Generator,
+    Generic,
+    Iterable,
+    Self,
+    Sequence,
+)
+from ryanvk._runtime import _upstream_staff
 from ryanvk._ordered_set import OrderedSet
-
+from ryanvk.fn.record import FnImplement
 from ryanvk.typing import (
     CallShape,
-    P,
-    R,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
+    P,
+    R,
     Twin,
 )
 
 if TYPE_CHECKING:
-    from ryanvk.staff import Staff  # noqa: F401
     from ryanvk.fn.base import Fn
-
-_StaffCtx = ContextVar["Staff"]("_StaffCtx")
+    from ryanvk.staff import Staff  # noqa: F401
 
 
 class FnCompose(ABC):
@@ -35,7 +43,7 @@ class FnCompose(ABC):
 
     @property
     def staff(self):
-        return _StaffCtx.get()
+        return _upstream_staff.get()
 
     @abstractmethod
     def call(self) -> FnComposeCallReturnType[Any]:
@@ -54,7 +62,7 @@ class FnCompose(ABC):
     def harvest(self: CallShape[P, R]) -> Generator[EntitiesHarvest[P, R], None, None]:
         harv = EntitiesHarvest(self.staff)  # type: ignore
         tok = EntitiesHarvest.mutation_endpoint.set(harv)
-        
+
         # i prefer not to rewrite a Protocol for just a "self.staff"
 
         try:
@@ -80,14 +88,16 @@ class EntitiesHarvest(Generic[P, R]):
         if self._incompleted_result is None:
             self._incompleted_result = OrderedSet(inbound)
             return
-        
+
         self._incompleted_result.intersection_update(inbound)
 
     @property
     def ensured_result(self):
         if not self.finished or self._incompleted_result is None:
-            raise LookupError("attempts to read result before its mutations all finished")
-    
+            raise LookupError(
+                "attempts to read result before its mutations all finished"
+            )
+
         return self._incompleted_result
 
     """
@@ -105,7 +115,7 @@ class EntitiesHarvest(Generic[P, R]):
             instance = self.staff.instances[collector.cls] = collector.cls(self.staff)
         else:
             instance = self.staff.instances[collector.cls]
-        
+
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             return implement(instance, *args, **kwargs)
 

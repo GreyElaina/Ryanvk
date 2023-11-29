@@ -1,6 +1,5 @@
 from __future__ import annotations
-from contextvars import ContextVar
-from typing import TYPE_CHECKING, Callable, ClassVar, Generic, Any, overload, cast
+from typing import TYPE_CHECKING, Callable, Generic, Any, overload, cast
 from typing_extensions import Self
 from ryanvk.collector import BaseCollector
 
@@ -39,13 +38,16 @@ class FnImplementEntity(Generic[P, R, K], BaseEntity):
         overload_enabled = type(self.fn.compose_instance).collect is FnCompose.collect
         record_signature = self.fn.compose_instance.signature()
         if record_signature not in collector.artifacts:
-            record = collector.artifacts[record_signature] = cast('FnRecord', {
-                "define": self,
-                "overload_enabled": overload_enabled,
-                "overload_scopes": {},
-                "legecy_slot": None,
-                "entities": {}
-            })
+            record = collector.artifacts[record_signature] = cast(
+                "FnRecord",
+                {
+                    "define": self,
+                    "overload_enabled": overload_enabled,
+                    "overload_scopes": {},
+                    "legecy_slot": None,
+                    "entities": {},
+                },
+            )
         else:
             record = collector.artifacts[record_signature]
 
@@ -55,7 +57,7 @@ class FnImplementEntity(Generic[P, R, K], BaseEntity):
         if not overload_enabled:
             record["legecy_slot"] = twin  # type: ignore
             return self
-        
+
         triples: set[tuple[str, FnOverload, Any]] = set()
 
         for harvest_info in self.fn.compose_instance.collect(*args, **kwargs):
@@ -64,7 +66,7 @@ class FnImplementEntity(Generic[P, R, K], BaseEntity):
             harvest_info.overload.collect(scope, sign, twin)
             triples.add((harvest_info.name, harvest_info.overload, sign))
 
-        record['entities'][frozenset(triples)] = twin
+        record["entities"][frozenset(triples)] = twin
 
         return self
 
