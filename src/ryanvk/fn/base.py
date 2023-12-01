@@ -7,7 +7,7 @@ from ryanvk.fn.compose import EntitiesHarvest, FnCompose
 from ryanvk._runtime import _upstream_staff
 from ryanvk.fn.entity import FnImplementEntity
 from ryanvk.fn.record import FnRecord
-from ryanvk.typing import FnComposeCallReturnType, P, R, inP, inR, inTC, outP, outR
+from ryanvk.typing import FnComposeCallReturnType, P, R, FnComposeCollectReturnType, inP, inR, inTC, outP, outR
 
 if TYPE_CHECKING:
     from ryanvk.staff import Staff
@@ -21,7 +21,7 @@ class FnMethodComposeCls(Protocol[outP, outR, inP, inR]):
     ) -> FnComposeCallReturnType[outR]:
         ...
 
-    def collect(self, *args: inP.args, **kwargs: inP.kwargs):
+    def collect(self, *args: inP.args, **kwargs: inP.kwargs) -> FnComposeCollectReturnType:
         ...
 
     def entity_type(self: Any) -> inR:
@@ -36,6 +36,7 @@ class Fn(Generic[P, R, K], BaseEntity):
         self.compose_instance = compose_cls(self)
 
     # TODO: Fn.symmetric based on Compose.
+    #       我严重怀疑这玩意实现不了。
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
         class LocalCompose(Generic[outP, outR], FnCompose):
@@ -64,26 +65,6 @@ class Fn(Generic[P, R, K], BaseEntity):
 
         record: FnRecord = artifacts[signature]
         define = record["define"]
-
-        if not record["overload_enabled"]:
-            assert record["legecy_slot"] is not None
-            collector, entity = record["legecy_slot"]
-
-            """
-            if collector.cls.__static__:
-                instance = collector.cls(staff)
-            else:
-                instance = staff.instances[collector.cls]  # TODO: new instance maintain
-            """
-
-            # FIXME: 仅供调试使用。
-
-            if collector.cls not in staff.instances:
-                instance = staff.instances[collector.cls] = collector.cls(staff)
-            else:
-                instance = staff.instances[collector.cls]
-
-            return entity(instance, *args, **kwargs)
 
         token = _upstream_staff.set(staff)
         try:

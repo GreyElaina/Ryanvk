@@ -8,7 +8,7 @@ from ryanvk.typing import Twin
 if TYPE_CHECKING:
     from .compose import FnCompose
 
-On = TypeVar("On", bound="FnOverload")
+On = TypeVar("On", bound="FnOverload", covariant=True)
 TCallValue = TypeVar("TCallValue")
 TCollectValue = TypeVar("TCollectValue")
 TSignature = TypeVar("TSignature")

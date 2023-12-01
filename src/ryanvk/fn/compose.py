@@ -25,6 +25,7 @@ from ryanvk.typing import (
     R,
     Twin,
 )
+from ryanvk.overloads import SingletonOverload
 
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
@@ -32,6 +33,8 @@ if TYPE_CHECKING:
 
 
 class FnCompose(ABC):
+    singleton = SingletonOverload().as_agent()
+
     fn: Fn
 
     def __init__(self, fn: Fn):
