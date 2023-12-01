@@ -16,6 +16,7 @@ from ryanvk.typing import (
     outR,
     inP,
     inR,
+    inTC,
     specifiedCollectP,
     unspecifiedCollectP,
 )
@@ -24,6 +25,9 @@ if TYPE_CHECKING:
     from ryanvk.staff import Staff
 
 K = TypeVar("K")
+
+outboundShape = TypeVar("outboundShape", bound=Callable, covariant=True)
+
 
 class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
     def call(
@@ -39,7 +43,7 @@ class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
         ...
 
 
-class Fn(Generic[P, R, unspecifiedCollectP], BaseEntity):
+class Fn(Generic[P, R, unspecifiedCollectP, outboundShape], BaseEntity):
     compose_instance: FnCompose
 
     def __init__(self, compose_cls: type[FnCompose]):
@@ -57,14 +61,14 @@ class Fn(Generic[P, R, unspecifiedCollectP], BaseEntity):
 
     @classmethod
     def compose(
-        cls: type[Fn[outP, outR, unspecifiedCollectP]],
+        cls: type[Fn[outP, outR, unspecifiedCollectP, Callable[outP, outR]]],
         compose_cls: type[FnMethodComposeCls[outP, outR, unspecifiedCollectP]],
     ):
         return cls(compose_cls)  # type: ignore
 
     @property
     def implements(
-        self: Fn[P, R, Concatenate[Callable[inP, inR], specifiedCollectP]]
+        self: Fn[P, R, Concatenate[Callable[inP, inR], specifiedCollectP], Any]
     ) -> Callable[
         specifiedCollectP,
         Callable[
@@ -86,12 +90,19 @@ class Fn(Generic[P, R, unspecifiedCollectP], BaseEntity):
 
         return wrapper  # type: ignore
 
-    def call1(self, staff: Staff):
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+    def call1(self: Fn[..., Any, Any, inTC], staff: Staff) -> inTC:
+        def wrapper(*args: outP.args, **kwargs: outP.kwargs) -> outR:
             return self.call(staff, *args, **kwargs)
-        return wrapper
+
+        return wrapper  # type: ignore
 
     def call(self, staff: Staff, *args: P.args, **kwargs: P.kwargs) -> R:
+        # FIXME: 什么时候去给 pyright 提个 issue 让 eric 彻底重构下现在 TypeVar binding 这坨狗屎。
+        #
+        #        无法将“type[str]”类型的参数分配给函数“call”中类型为“type[T@call]”的参数“value”
+        #            无法将类型“type[str]”分配给类型“type[T@call]”
+        #
+        #        真是畜生啊。
         signature = self.compose_instance.signature()
         for artifacts in staff.iter_artifacts(signature):
             if signature in artifacts:

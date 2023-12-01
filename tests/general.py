@@ -29,7 +29,7 @@ class TestPerform(m._):
             def __call__(self, value: type[T]) -> T:
                 ...
 
-        def collect(self, implement: ShapeCall[T], type: type[T]):
+        def collect(self, implement: ShapeCall[T], *, type: type[T]):
             yield self.type.collect(type)
 
 
@@ -37,13 +37,11 @@ n = BaseCollector()
 
 class TestPerformAlt(n._):
     @n.entity
-    @TestPerform.test.implements(str)
+    @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return ""
 
 
 a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
-reveal_type(TestPerform.test)
-
-TestPerform.test.call1(a)(str)
+b = TestPerform.test.call(a, str)
