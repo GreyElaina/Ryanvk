@@ -7,29 +7,39 @@ from ryanvk.fn.compose import EntitiesHarvest, FnCompose
 from ryanvk._runtime import _upstream_staff
 from ryanvk.fn.entity import FnImplementEntity
 from ryanvk.fn.record import FnRecord
-from ryanvk.typing import FnComposeCallReturnType, P, R, FnComposeCollectReturnType, inP, inR, inTC, outP, outR
+from ryanvk.typing import (
+    FnComposeCallReturnType,
+    P,
+    R,
+    FnComposeCollectReturnType,
+    outP,
+    outR,
+    inP,
+    inR,
+    specifiedCollectP,
+    unspecifiedCollectP,
+)
 
 if TYPE_CHECKING:
     from ryanvk.staff import Staff
 
 K = TypeVar("K")
 
-
-class FnMethodComposeCls(Protocol[outP, outR, inP, inR]):
+class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
     def call(
         self, *args: outP.args, **kwargs: outP.kwargs
     ) -> FnComposeCallReturnType[outR]:
         ...
 
-    def collect(self, *args: inP.args, **kwargs: inP.kwargs) -> FnComposeCollectReturnType:
+    def collect(
+        self,
+        *args: unspecifiedCollectP.args,
+        **kwargs: unspecifiedCollectP.kwargs,
+    ) -> FnComposeCollectReturnType:
         ...
 
-    def entity_type(self: Any) -> inR:
-        # 我不确定 self: Any 是否是必要的。
-        ...
 
-
-class Fn(Generic[P, R, K], BaseEntity):
+class Fn(Generic[P, R, unspecifiedCollectP], BaseEntity):
     compose_instance: FnCompose
 
     def __init__(self, compose_cls: type[FnCompose]):
@@ -47,13 +57,39 @@ class Fn(Generic[P, R, K], BaseEntity):
 
     @classmethod
     def compose(
-        cls: type[Fn[outP, outR, Callable[inP, inR]]],
-        compose_cls: type[FnMethodComposeCls[outP, outR, inP, inR]],
+        cls: type[Fn[outP, outR, unspecifiedCollectP]],
+        compose_cls: type[FnMethodComposeCls[outP, outR, unspecifiedCollectP]],
     ):
         return cls(compose_cls)  # type: ignore
 
-    def implements(self: Fn[P, R, Callable[inP, inTC]], impl: inTC):
-        return FnImplementEntity(self, impl)
+    @property
+    def implements(
+        self: Fn[P, R, Concatenate[Callable[inP, inR], specifiedCollectP]]
+    ) -> Callable[
+        specifiedCollectP,
+        Callable[
+            [Callable[Concatenate[K, inP], inR]],
+            FnImplementEntity[
+                P, R, Callable[Concatenate[K, inP], inR], specifiedCollectP
+            ],
+        ],
+    ]:
+        def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
+            def inner(
+                impl: Callable[Concatenate[K, inP], inR]
+            ) -> FnImplementEntity[
+                P, R, Callable[Concatenate[K, inP], inR], specifiedCollectP
+            ]:
+                return FnImplementEntity(self, impl, *args, **kwargs)
+
+            return inner
+
+        return wrapper  # type: ignore
+
+    def call1(self, staff: Staff):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            return self.call(staff, *args, **kwargs)
+        return wrapper
 
     def call(self, staff: Staff, *args: P.args, **kwargs: P.kwargs) -> R:
         signature = self.compose_instance.signature()

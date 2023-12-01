@@ -4,7 +4,7 @@ from collections import ChainMap
 from contextlib import AsyncExitStack, asynccontextmanager
 from contextvars import ContextVar
 from copy import copy
-from typing import TYPE_CHECKING, Any, Callable, Protocol, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Callable, MutableMapping, Protocol, TypeVar, overload
 
 from typing_extensions import ParamSpec
 
@@ -21,17 +21,15 @@ _iter_stack_collection = ContextVar[dict[Any, list[int]]]("_CurrentIterStack")
 
 
 class Staff:
-    artifact_collections: list[dict[Any, Any]]
-    artifact_map: ChainMap[Any, Any]
+    artifact_collections: list[MutableMapping[Any, Any]]
     components: dict[str, Any]
     exit_stack: AsyncExitStack
     instances: dict[type, Any]
 
     def __init__(
-        self, artifacts_collections: list[dict[Any, Any]], components: dict[str, Any]
+        self, artifacts_collections: list[MutableMapping[Any, Any]], components: dict[str, Any]
     ) -> None:
         self.artifact_collections = artifacts_collections
-        self.artifact_map = ChainMap(*artifacts_collections)
         self.components = components
         self.exit_stack = AsyncExitStack()
         self.instances = {}

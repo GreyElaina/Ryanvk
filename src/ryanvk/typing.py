@@ -23,14 +23,18 @@ P1 = ParamSpec("P1")
 T1 = TypeVar("T1")
 T2 = TypeVar("T2")
 
-inP = ParamSpec("inP")
 outP = ParamSpec("outP")
-inR = TypeVar("inR", covariant=True)
 outR = TypeVar("outR", covariant=True)
+inP = ParamSpec("inP")
+inR = TypeVar("inR", covariant=True)
+
+unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
+specifiedCollectP = ParamSpec("specifiedCollectP")
 
 inRC = TypeVar("inRC", covariant=True, bound=Callable)
 inTC = TypeVar("inTC", bound=Callable)
 
+inQ = TypeVar("inQ", contravariant=True)
 
 class SupportsCollect(Protocol[P, R]):
     def collect(self, collector: Any, *args: P.args, **kwargs: P.kwargs) -> R:  # type: ignore
