@@ -37,7 +37,7 @@ inTC = TypeVar("inTC", bound=Callable)
 inQ = TypeVar("inQ", contravariant=True)
 
 class SupportsCollect(Protocol[P, R]):
-    def collect(self, collector: Any, *args: P.args, **kwargs: P.kwargs) -> R:  # type: ignore
+    def collect(self, collector: Any, *args: P.args, **kwargs: P.kwargs) -> R:
         ...
 
 
@@ -54,5 +54,5 @@ class CallShape(Protocol[P, R]):
 
 Twin: TypeAlias = "tuple[BaseCollector, Any]"
 
-FnComposeCollectReturnType = Generator[FnOverloadHarvest, Any, None]
-FnComposeCallReturnType = Generator[FnOverloadHarvest, None, R]
+FnComposeCollectReturnType = Generator["FnOverloadHarvest", Any, None]
+FnComposeCallReturnType = Generator["FnOverloadHarvest", None, R]

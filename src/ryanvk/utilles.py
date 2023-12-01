@@ -3,7 +3,7 @@ import functools
 from typing import Callable, TypeVar
 from contextvars import copy_context
 
-from ryanvk.staff import P, R
+from ryanvk.typing import P, R
 
 T = TypeVar("T")
 

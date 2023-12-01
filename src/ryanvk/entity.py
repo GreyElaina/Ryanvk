@@ -25,7 +25,7 @@ class BaseEntity:
     def _fallback_collected_callback(self, cls: type):
         self.assign_callback({})
 
-    def __set_name__(self, name: str, owner: type):
+    def __set_name__(self, owner: type, name: str):
         assert self.collector is not None
 
         if not issubclass(owner, BasePerform):

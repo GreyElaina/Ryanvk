@@ -52,9 +52,6 @@ class FnCompose(ABC):
     def call(self) -> FnComposeCallReturnType[Any]:
         ...
 
-    def entity_type(self: CallShape[P, R]):  # type: ignore
-        return self.call
-
     def collect(self, implement: Callable, **kwargs: Any) -> FnComposeCollectReturnType:
         ...
 

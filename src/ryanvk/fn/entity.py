@@ -4,7 +4,6 @@ from typing_extensions import Self, Concatenate
 from ryanvk.collector import BaseCollector
 
 from ryanvk.entity import BaseEntity
-from ryanvk.fn.base import K, Fn
 from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.record import FnRecord
 from ryanvk.typing import P, R, inRC, specifiedCollectP
@@ -12,16 +11,17 @@ from ryanvk.typing import P, R, inRC, specifiedCollectP
 from ryanvk.perform import BasePerform
 
 if TYPE_CHECKING:
+    from ryanvk.fn.base import Fn
     from ryanvk.fn.overload import FnOverload
 
 
 class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
-    fn: Fn[P, R, Concatenate[Any, specifiedCollectP]]
+    fn: Fn[P, R, Concatenate[Any, specifiedCollectP], Any]
     impl: Callable[..., Any]
 
     def __init__(
         self: FnImplementEntity[P, R, inRC, specifiedCollectP],
-        fn: Fn[P, R, Concatenate[Any, specifiedCollectP]],
+        fn: Fn[P, R, Concatenate[Any, specifiedCollectP], Any],
         impl: inRC,
         *args: specifiedCollectP.args,
         **kwargs: specifiedCollectP.kwargs,
@@ -38,16 +38,13 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
     ):
         super().collect(collector)
 
-        overload_enabled = type(self.fn.compose_instance).collect is FnCompose.collect
         record_signature = self.fn.compose_instance.signature()
         if record_signature not in collector.artifacts:
             record = collector.artifacts[record_signature] = cast(
                 "FnRecord",
                 {
-                    "define": self,
-                    "overload_enabled": overload_enabled,
+                    "define": self.fn,
                     "overload_scopes": {},
-                    "legecy_slot": None,
                     "entities": {},
                 },
             )
@@ -57,13 +54,9 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
         overload_scopes = record["overload_scopes"]
         twin = (collector, self.impl)
 
-        if not overload_enabled:
-            record["legecy_slot"] = twin  # type: ignore
-            return self
-
         triples: set[tuple[str, FnOverload, Any]] = set()
 
-        for harvest_info in self.fn.compose_instance.collect(*self._collect_args, **self._collect_kwargs):
+        for harvest_info in self.fn.compose_instance.collect(self.impl, *self._collect_args, **self._collect_kwargs):
             sign = harvest_info.overload.signature_from_collect(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             harvest_info.overload.collect(scope, sign, twin)

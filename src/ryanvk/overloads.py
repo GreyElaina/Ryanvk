@@ -9,7 +9,29 @@ from dataclasses import dataclass
 
 from typing import Any, Callable, Sequence
 
-@dataclass
+@dataclass(eq=True, frozen=True)
+class SimpleOverloadSignature:
+    value: Any
+
+class SimpleOverload(FnOverload[SimpleOverloadSignature, type[Any], Any]):
+    def signature_from_collect(self, collect_value: Any) -> SimpleOverloadSignature:
+        return SimpleOverloadSignature(collect_value)
+
+    def collect(self, scope: dict, signature: SimpleOverloadSignature, twin: Twin) -> None:
+        if signature.value not in scope:
+            target = scope[signature.value] = OrderedSet()
+        else:
+            target = scope[signature.value]
+        
+        target.add(twin)
+    
+    def harvest(self, scope: dict, value: Any) -> Sequence[tuple[BaseCollector, Callable[..., Any]]]:
+        if value in scope:
+            return scope[value]
+
+        return ()
+
+@dataclass(eq=True, frozen=True)
 class TypeOverloadSignature:
     type: type[Any]
 
