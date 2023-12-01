@@ -25,7 +25,7 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
     def iter_entities(
         self, record: FnRecord
     ) -> MutableMapping[frozenset[tuple[str, "FnOverload", Any]], Twin]:
-        return record['entities']
+        return record["entities"]
 
     def insist_objects(self, record: FnRecord) -> Iterable[Any]:
         return [*record["entities"].keys(), *record["entities"].values()]
@@ -43,6 +43,13 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
         signature: frozenset[tuple[str, "FnOverload", Any]],
     ) -> Twin:
         return record["entities"][signature]
+
+    def new_record(self) -> FnRecord:
+        return {
+            "define": self.fn,
+            "overload_scopes": {},
+            "entities": {},
+        }
 
     def flatten_on(
         self,

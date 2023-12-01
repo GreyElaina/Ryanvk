@@ -9,6 +9,8 @@ from ryanvk.overloads import TypeOverload, SimpleOverload
 from ryanvk.staff import Staff
 from ryanvk.typing import FnComposeCallReturnType, P, R
 
+from ryanvk.topic import merge_topics_if_possible
+
 m = BaseCollector()
 T = TypeVar("T")
 
@@ -24,7 +26,7 @@ class TestPerform(m._):
             with self.harvest() as entities:
                 yield self.sim.call(value)
 
-            print(entities._incompleted_result)
+            #print(entities._incompleted_result)
             return entities.first(value)
 
         class ShapeCall(Protocol[T]):
@@ -35,16 +37,30 @@ class TestPerform(m._):
             yield self.sim.collect(type)
 
 
-n = BaseCollector()
-
-class TestPerformAlt(n._):
+class TestPerformAlt((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷声作响，空气振振有声。"
 
+class TestPerformAlt1((n := BaseCollector())._):
+    @n.entity
+    @TestPerform.test.implements(type=str)
+    def test_impl_int(self, value: type[str]) -> str:
+        return "多层测试 - Alt1"
+
+class TestPerformAlt2((n := BaseCollector())._):
+    @n.entity
+    @TestPerform.test.implements(type=str)
+    def test_impl_int(self, value: type[str]) -> str:
+        return "多层测试 - Alt2"
 
 a = Staff([TestPerformAlt.__collector__.artifacts], {})
+
+merge_topics_if_possible([
+    TestPerformAlt2.__collector__.artifacts,
+    TestPerformAlt1.__collector__.artifacts
+], a.artifact_collections)
 
 print(TestPerformAlt.__collector__.artifacts)
 b = TestPerform.test.call1(a)(str)

@@ -1,6 +1,15 @@
 from __future__ import annotations
 from itertools import chain, cycle
-from typing import Any, Callable, Iterable, MutableMapping, TypeVar, Generic
+from typing import (
+    AbstractSet,
+    Any,
+    Callable,
+    Iterable,
+    Mapping,
+    MutableMapping,
+    TypeVar,
+    Generic,
+)
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -58,50 +67,54 @@ class PileTopic(Generic[T, S, E], Topic[T]):
         for key, group in _groupby(entities, key=lambda x: x[0]).items():
             outbound_index = 0
             for group_inx, i in cycle(enumerate(group)):
-                if i is None:
+                print("我操",group_inx, i, group)
+                if group[group_inx] is None:
                     break
 
-                if self.has_entity(outbound[outbound_index], key):
+                #print(outbound, outbound_index)
+
+                if self.has_entity(outbound[outbound_index][self], key):
                     group[group_inx] = (
                         key,
-                        self.get_entity(outbound[outbound_index], key),
+                        self.get_entity(outbound[outbound_index][self], key),
                     )
                 else:
                     group[group_inx] = None  # type: ignore
 
-                self.flatten_on(outbound[outbound_index], key, i[1])
+                self.flatten_on(outbound[outbound_index][self], key, i[1])
                 outbound_index += 1
+                print(outbound_index, outbound_depth, key, group, i)
                 if outbound_index == outbound_depth:
                     outbound_depth += 1
-                    outbound.append(self.new_record())
+                    outbound.append({self: self.new_record()})
 
 
 def merge_topics_if_possible(
-    inbounds: list[dict[Any, Any]],
-    outbound: list[dict[Any, Any]],
+    inbounds: list[MutableMapping[Any, Any]],
+    outbound: list[MutableMapping[Any, Any]],
     *,
     replace_non_topic: bool = True,
 ) -> None:
-    inbound_pairs = set(chain(*[i.items() for i in inbounds]))
-
     topic_pair_records: dict[Topic, list[Any]] = {}
 
     done_replace = set()
 
-    for maybe_topic, record in inbound_pairs:
-        if isinstance(maybe_topic, Topic):
-            if maybe_topic not in topic_pair_records:
-                pair_v = topic_pair_records[maybe_topic] = []
-            else:
-                pair_v = topic_pair_records[maybe_topic]
+    for pairs in inbounds:
+        for maybe_topic, record in pairs.items():
+            if isinstance(maybe_topic, Topic):
+                if maybe_topic not in topic_pair_records:
+                    pair_v = topic_pair_records[maybe_topic] = []
+                else:
+                    pair_v = topic_pair_records[maybe_topic]
 
-            pair_v.append(record)
-        elif replace_non_topic and maybe_topic not in done_replace:
-            outbound[0][maybe_topic] = record
-            done_replace.add(maybe_topic)
+                pair_v.append(record)
+            elif replace_non_topic and maybe_topic not in done_replace:
+                outbound[0][maybe_topic] = record
+                done_replace.add(maybe_topic)
 
     for topic, records in topic_pair_records.items():
         if topic not in outbound[0]:
             outbound[0][topic] = topic.new_record()
 
+        print("222", outbound)
         topic.merge(records, outbound)
