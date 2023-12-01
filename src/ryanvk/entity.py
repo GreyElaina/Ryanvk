@@ -1,5 +1,4 @@
 from __future__ import annotations
-from contextlib import suppress
 from typing import TypedDict, NotRequired, Any
 
 from ryanvk.collector import BaseCollector
@@ -32,8 +31,10 @@ class BaseEntity:
         if not issubclass(owner, BasePerform):
             return
 
-        with suppress(ValueError):
+        try:
             self.collector.remove_collected_callback(self._fallback_collected_callback)
+        except ValueError:
+            pass
 
         @self.collector.on_collected
         def collected_callback(cls: type):
