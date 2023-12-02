@@ -5,6 +5,7 @@ from typing import (
     Callable,
     Iterable,
     MutableMapping,
+    Self,
     TypeVar,
     Generic,
 )
@@ -55,7 +56,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
     ) -> None:
         ...
 
-    def merge(self, inbound: list[T], outbound: list[T]) -> None:
+    def merge(self, inbound: list[T], outbound: list[MutableMapping[Self, T]]) -> None:
         outbound_depth = len(outbound)
 
         entities = chain(
@@ -68,8 +69,6 @@ class PileTopic(Generic[T, S, E], Topic[T]):
             # group: list[(Signature, Entity / Twin)]
             outbound_index = 0
             for group_inx in cycle(range(len(group))):
-                # FIXME: use cycle(enumerate(range))
-
                 if group[group_inx] is None:
                     break
 
