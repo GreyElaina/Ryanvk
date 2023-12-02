@@ -6,7 +6,7 @@ from ryanvk.collector import BaseCollector
 from ryanvk.entity import BaseEntity
 from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.record import FnRecord
-from ryanvk.typing import P, R, inRC, specifiedCollectP
+from ryanvk.typing import P, R, inRC, specifiedCollectP, outP, outR
 
 from ryanvk.perform import BasePerform
 
@@ -28,7 +28,7 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
     ):
         self.fn = fn
         self.impl = impl
-        
+
         self._collect_args = args
         self._collect_kwargs = kwargs
 
@@ -56,7 +56,9 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
 
         triples: set[tuple[str, FnOverload, Any]] = set()
 
-        for harvest_info in self.fn.compose_instance.collect(self.impl, *self._collect_args, **self._collect_kwargs):
+        for harvest_info in self.fn.compose_instance.collect(
+            self.impl, *self._collect_args, **self._collect_kwargs
+        ):
             sign = harvest_info.overload.signature_from_collect(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             harvest_info.overload.collect(scope, sign, twin)
@@ -68,8 +70,8 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
 
     @overload
     def __get__(
-        self, instance: BasePerform, owner: type
-    ) -> FnImplementEntityAgent[P, R, specifiedCollectP]:
+        self: FnImplementEntity[..., Any, Callable[Concatenate[Any, outP], outR], Any], instance: BasePerform, owner: type
+    ) -> FnImplementEntityAgent[Callable[outP, outR]]:
         ...
 
     @overload
@@ -83,13 +85,14 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
         return FnImplementEntityAgent(instance, self)
 
 
-class FnImplementEntityAgent(Generic[P, R, specifiedCollectP]):
-    perfrom: BasePerform
-    entity: FnImplementEntity[P, R, Any, specifiedCollectP]
+# TODO: make pyright happy.
 
-    def __init__(
-        self, perform: BasePerform, entity: FnImplementEntity[P, R, Any, specifiedCollectP]
-    ) -> None:
+
+class FnImplementEntityAgent(Generic[inRC]):
+    perfrom: BasePerform
+    entity: FnImplementEntity[..., Any, inRC, ...]
+
+    def __init__(self, perform: BasePerform, entity: FnImplementEntity) -> None:
         self.perform = perform
         self.entity = entity
 
@@ -97,8 +100,16 @@ class FnImplementEntityAgent(Generic[P, R, specifiedCollectP]):
     def staff(self):
         return self.perform.staff
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        return self.entity.impl(self.perform, *args, **kwargs)
+    @property
+    def __call__(self) -> inRC:
+        def wrapper(*args, **kwargs):
+            return self.entity.impl(self.perform, *args, **kwargs)
 
-    def super(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        return self.entity.fn.call(self.staff, *args, **kwargs)
+        return wrapper  # type: ignore
+
+    @property
+    def super(self) -> inRC:
+        def wrapper(*args, **kwargs):
+            return self.entity.fn.call(self.staff, *args, **kwargs)
+
+        return wrapper  # type: ignore

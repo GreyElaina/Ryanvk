@@ -103,28 +103,27 @@ class Fn(Generic[P, R, unspecifiedCollectP, outboundShape], BaseEntity):
         #            无法将类型“type[str]”分配给类型“type[T@call]”
         #
         #        真是畜生啊。
+
         signature = self.compose_instance.signature()
         for artifacts in staff.iter_artifacts(signature):
             if signature in artifacts:
-                break
+                record: FnRecord = artifacts[signature]
+                define = record["define"]
+
+                token = _upstream_staff.set(staff)
+                try:
+                    iters = define.compose_instance.call(*args, **kwargs)
+                    harvest_info = next(iters)
+                    harv = EntitiesHarvest.mutation_endpoint.get()
+                    while True:
+                        scope = record["overload_scopes"][harvest_info.name]
+                        stage = harvest_info.overload.harvest(scope, harvest_info.value)
+                        harv.commit(stage)
+                        harvest_info = next(iters)
+
+                except StopIteration as e:
+                    return e.value
+                finally:
+                    _upstream_staff.reset(token)
         else:
             raise NotImplementedError
-
-        record: FnRecord = artifacts[signature]
-        define = record["define"]
-
-        token = _upstream_staff.set(staff)
-        try:
-            iters = define.compose_instance.call(*args, **kwargs)
-            harvest_info = next(iters)
-            harv = EntitiesHarvest.mutation_endpoint.get()
-            while True:
-                scope = record["overload_scopes"][harvest_info.name]
-                stage = harvest_info.overload.harvest(scope, harvest_info.value)
-                harv.commit(stage)
-                harvest_info = next(iters)
-
-        except StopIteration as e:
-            return e.value
-        finally:
-            _upstream_staff.reset(token)

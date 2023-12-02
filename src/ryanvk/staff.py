@@ -70,12 +70,12 @@ class Staff:
     def iter_artifacts(self, key: Any | None = None):
         collection = _iter_stack_collection.get(None)
         if collection is None:
-            stack = [-1]
-            _iter_stack_collection.set({key: stack})
+            collection = {}
+            _iter_stack_collection.set(collection)
+        
+        if key not in collection:
+            stack = collection[key] = [-1]
         else:
-            if key not in collection:
-                collection[key] = [-1]
-
             stack = collection[key]
 
         index = stack[-1]

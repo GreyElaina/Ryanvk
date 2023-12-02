@@ -41,26 +41,34 @@ class TestPerformAlt((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
-        return "手杖闷声作响，空气振振有声。"
+        return "手杖闷闷作响，空气振振有声。"
 
 class TestPerformAlt1((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
+        print(self.test_impl_int.super(value))
         return "多层测试 - Alt1"
 
 class TestPerformAlt2((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
+        print(self.test_impl_int.super(value))
         return "多层测试 - Alt2"
 
 a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
-merge_topics_if_possible([
+#merge_topics_if_possible([
+#    TestPerformAlt2.__collector__.artifacts,
+#    TestPerformAlt1.__collector__.artifacts
+#], a.artifact_collections)
+
+a.artifact_collections = [
     TestPerformAlt2.__collector__.artifacts,
-    TestPerformAlt1.__collector__.artifacts
-], a.artifact_collections)
+    TestPerformAlt1.__collector__.artifacts,
+    TestPerformAlt.__collector__.artifacts
+]
 
 print(TestPerformAlt.__collector__.artifacts)
 b = TestPerform.test.call1(a)(str)
