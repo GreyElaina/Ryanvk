@@ -88,14 +88,14 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
 
         return wrapper  # type: ignore
 
-    def call1(self: Fn[Any, inTC], staff: Staff) -> inTC:
-        def wrapper(*args: outP.args, **kwargs: outP.kwargs) -> outR:
+    def call1(self: Fn[..., inTC], staff: Staff) -> inTC:
+        def wrapper(*args, **kwargs):
             return self.call(staff, *args, **kwargs)
 
         return wrapper  # type: ignore
 
     def call(
-        self: Fn[Any, Callable[P, R]], staff: Staff, *args: P.args, **kwargs: P.kwargs
+        self: Fn[..., Callable[P, R]], staff: Staff, *args: P.args, **kwargs: P.kwargs
     ) -> R:
         # FIXME: 什么时候去给 pyright 提个 issue 让 eric 彻底重构下现在 TypeVar binding 这坨狗屎。
         #

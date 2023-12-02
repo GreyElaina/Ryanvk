@@ -100,12 +100,6 @@ class EntitiesHarvest(Generic[P, R]):
 
         return self._incompleted_result
 
-    """
-    def resolve_perform_param(self, twin: Twin) -> Callable[P, R]:
-        # TODO, 诶不这个是拿来干什么的来着。
-        ...
-    """
-
     def ensure_twin(self, twin: Twin) -> Callable[P, R]:
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。

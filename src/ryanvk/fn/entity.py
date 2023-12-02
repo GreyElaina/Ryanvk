@@ -88,9 +88,6 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
         return FnImplementEntityAgent(instance, self)
 
 
-# TODO: make pyright happy.
-
-
 class FnImplementEntityAgent(Generic[inRC]):
     perfrom: BasePerform
     entity: FnImplementEntity[inRC, ...]
