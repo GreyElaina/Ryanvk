@@ -1,7 +1,17 @@
 from __future__ import annotations
-from typing import Any, Callable, Generic, Sequence, TypeVar, TYPE_CHECKING, overload
+
+from typing import (
+    TYPE_CHECKING,
+    AbstractSet,
+    Any,
+    Generic,
+    MutableSet,
+    TypeVar,
+    overload,
+)
+
 from typing_extensions import Self
-from ryanvk.collector import BaseCollector
+
 from ryanvk.fn.record import FnOverloadHarvest
 from ryanvk.typing import Twin
 
@@ -18,19 +28,20 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
     def __init__(self) -> None:
         ...
 
-    def signature_from_collect(self, collect_value: TCollectValue) -> TSignature:
-        return collect_value  # type: ignore
-
-    def collect(self, scope: dict, signature: TSignature, twin: Twin) -> None:
-        scope[signature] = twin
-
-    def harvest(
-        self, scope: dict, value: TCallValue
-    ) -> Sequence[tuple[BaseCollector, Callable]]:
-        return scope[value]
-
     def as_agent(self):
         return FnOverloadAgentDescriptor(self)
+
+    def digest(self, collect_value: TCollectValue) -> TSignature:
+        ...
+
+    def collect(self, scope: dict, signature: TSignature) -> MutableSet[Twin]:
+        ...
+
+    def harvest(self, scope: dict, value: TCallValue) -> AbstractSet[Twin]:
+        ...
+
+    def track(self, scope: dict, signature: TSignature) -> MutableSet[Twin]:
+        ...
 
 
 class FnOverloadAgent(Generic[On]):

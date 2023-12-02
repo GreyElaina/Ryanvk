@@ -1,13 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-from typing import TYPE_CHECKING, Any, Callable, Iterable, MutableMapping, TypedDict
+from typing import TYPE_CHECKING, Any, Iterable, MutableMapping, TypedDict
 
 from ryanvk.topic import PileTopic
 from ryanvk.typing import Twin
 
 if TYPE_CHECKING:
-    from ryanvk.collector import BaseCollector
     from ryanvk.fn.overload import FnOverload
     from .base import Fn
 
@@ -56,7 +55,9 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
         record: FnRecord,
         signature: tuple[tuple[str, "FnOverload", Any], ...],
         entity: Twin,
+        replacement: Twin | None,
     ) -> None:
+        # FIXME: 处理 fn_define
         scopes = record["overload_scopes"]
         for segment in signature:
             name, fn_overload, sign = segment
@@ -65,7 +66,12 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
             else:
                 scope = scopes[name]
 
-            fn_overload.collect(scope, sign, entity)
+            target_set = fn_overload.collect(scope, sign)
+            target_set.add(entity)
+            if replacement is not None:
+                target_set.remove(replacement)
+
+        record["entities"][frozenset(signature)] = entity
 
 
 # TODO: 弃用 Harvest，因为让我很烦。

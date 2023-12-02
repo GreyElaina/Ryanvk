@@ -36,6 +36,7 @@ inTC = TypeVar("inTC", bound=Callable)
 
 inQ = TypeVar("inQ", contravariant=True)
 
+
 class SupportsCollect(Protocol[P, R]):
     def collect(self, collector: Any, *args: P.args, **kwargs: P.kwargs) -> R:
         ...

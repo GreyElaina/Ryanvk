@@ -1,10 +1,17 @@
 from __future__ import annotations
 
-from collections import ChainMap
 from contextlib import AsyncExitStack, asynccontextmanager
 from contextvars import ContextVar
 from copy import copy
-from typing import TYPE_CHECKING, Any, Callable, MutableMapping, Protocol, TypeVar, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    MutableMapping,
+    Protocol,
+    TypeVar,
+    overload,
+)
 
 from typing_extensions import ParamSpec
 
@@ -27,7 +34,9 @@ class Staff:
     instances: dict[type, Any]
 
     def __init__(
-        self, artifacts_collections: list[MutableMapping[Any, Any]], components: dict[str, Any]
+        self,
+        artifacts_collections: list[MutableMapping[Any, Any]],
+        components: dict[str, Any],
     ) -> None:
         self.artifact_collections = artifacts_collections
         self.components = components
@@ -72,7 +81,7 @@ class Staff:
         if collection is None:
             collection = {}
             _iter_stack_collection.set(collection)
-        
+
         if key not in collection:
             stack = collection[key] = [-1]
         else:

@@ -5,7 +5,7 @@
 groups = ["default", "dev", "orderedset"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:0ed6f4ae31a04e12a9dfe9300e47da39926fb9fa234895023de23d4d1ce0b119"
+content_hash = "sha256:da8a3dda81a56825a7856ec7dd972ff464e25c5827c63f979c25070d1fd0a4e1"
 
 [[package]]
 name = "appnope"
@@ -106,6 +106,21 @@ summary = "Decorators for Humans"
 files = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
+]
+
+[[package]]
+name = "devtools"
+version = "0.12.2"
+requires_python = ">=3.7"
+summary = "Python's missing debug print command, and more."
+dependencies = [
+    "asttokens<3.0.0,>=2.0.0",
+    "executing>=1.1.1",
+    "pygments>=2.15.0",
+]
+files = [
+    {file = "devtools-0.12.2-py3-none-any.whl", hash = "sha256:c366e3de1df4cdd635f1ad8cbcd3af01a384d7abda71900e68d43b04eb6aaca7"},
+    {file = "devtools-0.12.2.tar.gz", hash = "sha256:efceab184cb35e3a11fa8e602cc4fadacaa2e859e920fc6f87bf130b69885507"},
 ]
 
 [[package]]

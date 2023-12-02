@@ -20,4 +20,5 @@ build-backend = "pdm.backend"
 dev = [
     "ruff>=0.1.3",
     "ipykernel>=6.27.1",
+    "devtools>=0.12.2",
 ]

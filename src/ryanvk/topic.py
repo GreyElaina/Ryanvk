@@ -1,11 +1,9 @@
 from __future__ import annotations
 from itertools import chain, cycle
 from typing import (
-    AbstractSet,
     Any,
     Callable,
     Iterable,
-    Mapping,
     MutableMapping,
     TypeVar,
     Generic,
@@ -52,7 +50,9 @@ class PileTopic(Generic[T, S, E], Topic[T]):
     def get_entity(self, record: T, signature: S) -> E:
         ...
 
-    def flatten_on(self, record: T, signature: S, entity: E) -> None:
+    def flatten_on(
+        self, record: T, signature: S, entity: E, replacement: E | None
+    ) -> None:
         ...
 
     def merge(self, inbound: list[T], outbound: list[T]) -> None:
@@ -64,29 +64,34 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                 for inbound_item in inbound
             ]
         )
-        for key, group in _groupby(entities, key=lambda x: x[0]).items():
+        for signature, group in _groupby(entities, key=lambda x: x[0]).items():
+            # group: list[(Signature, Entity / Twin)]
             outbound_index = 0
-            for group_inx, i in cycle(enumerate(group)):
-                print("我操",group_inx, i, group)
+            for group_inx in cycle(range(len(group))):
+                # FIXME: use cycle(enumerate(range))
+
                 if group[group_inx] is None:
                     break
 
-                #print(outbound, outbound_index)
-
-                if self.has_entity(outbound[outbound_index][self], key):
-                    group[group_inx] = (
-                        key,
-                        self.get_entity(outbound[outbound_index][self], key),
-                    )
-                else:
-                    group[group_inx] = None  # type: ignore
-
-                self.flatten_on(outbound[outbound_index][self], key, i[1])
-                outbound_index += 1
-                print(outbound_index, outbound_depth, key, group, i)
+                _, entity = group[group_inx]
                 if outbound_index == outbound_depth:
                     outbound_depth += 1
                     outbound.append({self: self.new_record()})
+
+                if self.has_entity(outbound[outbound_index][self], signature):
+                    e = self.get_entity(outbound[outbound_index][self], signature)
+                    group[group_inx] = (signature, e)
+                    self.flatten_on(
+                        outbound[outbound_index][self], signature, entity, e
+                    )
+                else:
+                    group[group_inx] = None  # type: ignore
+                    self.flatten_on(
+                        outbound[outbound_index][self], signature, entity, None
+                    )
+
+                outbound_index += 1
+                # print(outbound_index, outbound_depth, key, group, i)
 
 
 def merge_topics_if_possible(
@@ -116,5 +121,4 @@ def merge_topics_if_possible(
         if topic not in outbound[0]:
             outbound[0][topic] = topic.new_record()
 
-        print("222", outbound)
         topic.merge(records, outbound)

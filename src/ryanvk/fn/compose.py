@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import (
     TYPE_CHECKING,
+    AbstractSet,
     Any,
     Callable,
     ClassVar,
@@ -12,7 +13,6 @@ from typing import (
     Generic,
     Iterable,
     Self,
-    Sequence,
 )
 from ryanvk._runtime import _upstream_staff
 from ryanvk._ordered_set import OrderedSet
@@ -84,7 +84,7 @@ class EntitiesHarvest(Generic[P, R]):
     def __init__(self, staff: Staff):
         self.staff = staff
 
-    def commit(self, inbound: Sequence[Twin]) -> None:
+    def commit(self, inbound: AbstractSet[Twin]) -> None:
         if self._incompleted_result is None:
             self._incompleted_result = OrderedSet(inbound)
             return

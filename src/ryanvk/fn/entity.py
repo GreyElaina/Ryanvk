@@ -1,27 +1,27 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable, Generic, Any, overload, cast
-from typing_extensions import Self, Concatenate
+
+from typing import TYPE_CHECKING, Any, Callable, Generic, cast, overload
+
+from typing_extensions import Concatenate, Self
+
 from ryanvk.collector import BaseCollector
-
 from ryanvk.entity import BaseEntity
-from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.record import FnRecord
-from ryanvk.typing import P, R, inRC, specifiedCollectP, outP, outR
-
 from ryanvk.perform import BasePerform
+from ryanvk.typing import inRC, outP, outR, specifiedCollectP
 
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
     from ryanvk.fn.overload import FnOverload
 
 
-class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
-    fn: Fn[P, R, Concatenate[Any, specifiedCollectP], Any]
+class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
+    fn: Fn[Concatenate[Any, specifiedCollectP], Any]
     impl: Callable[..., Any]
 
     def __init__(
-        self: FnImplementEntity[P, R, inRC, specifiedCollectP],
-        fn: Fn[P, R, Concatenate[Any, specifiedCollectP], Any],
+        self: FnImplementEntity[inRC, specifiedCollectP],
+        fn: Fn[Concatenate[Any, specifiedCollectP], Any],
         impl: inRC,
         *args: specifiedCollectP.args,
         **kwargs: specifiedCollectP.kwargs,
@@ -33,7 +33,7 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
         self._collect_kwargs = kwargs
 
     def collect(
-        self: FnImplementEntity[P, R, inRC, specifiedCollectP],
+        self: FnImplementEntity[inRC, specifiedCollectP],
         collector: BaseCollector,
     ):
         super().collect(collector)
@@ -59,9 +59,10 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
         for harvest_info in self.fn.compose_instance.collect(
             self.impl, *self._collect_args, **self._collect_kwargs
         ):
-            sign = harvest_info.overload.signature_from_collect(harvest_info.value)
+            sign = harvest_info.overload.digest(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
-            harvest_info.overload.collect(scope, sign, twin)
+            target_set = harvest_info.overload.collect(scope, sign)
+            target_set.add(twin)
             triples.add((harvest_info.name, harvest_info.overload, sign))
 
         record["entities"][frozenset(triples)] = twin
@@ -70,7 +71,9 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
 
     @overload
     def __get__(
-        self: FnImplementEntity[..., Any, Callable[Concatenate[Any, outP], outR], Any], instance: BasePerform, owner: type
+        self: FnImplementEntity[Callable[Concatenate[Any, outP], outR], Any],
+        instance: BasePerform,
+        owner: type,
     ) -> FnImplementEntityAgent[Callable[outP, outR]]:
         ...
 
@@ -90,7 +93,7 @@ class FnImplementEntity(Generic[P, R, inRC, specifiedCollectP], BaseEntity):
 
 class FnImplementEntityAgent(Generic[inRC]):
     perfrom: BasePerform
-    entity: FnImplementEntity[..., Any, inRC, ...]
+    entity: FnImplementEntity[inRC, ...]
 
     def __init__(self, perform: BasePerform, entity: FnImplementEntity) -> None:
         self.perform = perform

@@ -43,7 +43,7 @@ class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
         ...
 
 
-class Fn(Generic[P, R, unspecifiedCollectP, outboundShape], BaseEntity):
+class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
     compose_instance: FnCompose
 
     def __init__(self, compose_cls: type[FnCompose]):
@@ -61,28 +61,26 @@ class Fn(Generic[P, R, unspecifiedCollectP, outboundShape], BaseEntity):
 
     @classmethod
     def compose(
-        cls: type[Fn[outP, outR, unspecifiedCollectP, Callable[outP, outR]]],
+        cls: type[Fn[unspecifiedCollectP, Callable[outP, outR]]],
         compose_cls: type[FnMethodComposeCls[outP, outR, unspecifiedCollectP]],
     ):
         return cls(compose_cls)  # type: ignore
 
     @property
     def implements(
-        self: Fn[P, R, Concatenate[Callable[inP, inR], specifiedCollectP], Any]
+        self: Fn[Concatenate[Callable[inP, inR], specifiedCollectP], Any]
     ) -> Callable[
         specifiedCollectP,
         Callable[
             [Callable[Concatenate[K, inP], inR]],
-            FnImplementEntity[
-                P, R, Callable[Concatenate[K, inP], inR], specifiedCollectP
-            ],
+            FnImplementEntity[Callable[Concatenate[K, inP], inR], specifiedCollectP],
         ],
     ]:
         def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
             def inner(
                 impl: Callable[Concatenate[K, inP], inR]
             ) -> FnImplementEntity[
-                P, R, Callable[Concatenate[K, inP], inR], specifiedCollectP
+                Callable[Concatenate[K, inP], inR], specifiedCollectP
             ]:
                 return FnImplementEntity(self, impl, *args, **kwargs)
 
@@ -90,13 +88,15 @@ class Fn(Generic[P, R, unspecifiedCollectP, outboundShape], BaseEntity):
 
         return wrapper  # type: ignore
 
-    def call1(self: Fn[..., Any, Any, inTC], staff: Staff) -> inTC:
+    def call1(self: Fn[Any, inTC], staff: Staff) -> inTC:
         def wrapper(*args: outP.args, **kwargs: outP.kwargs) -> outR:
             return self.call(staff, *args, **kwargs)
 
         return wrapper  # type: ignore
 
-    def call(self, staff: Staff, *args: P.args, **kwargs: P.kwargs) -> R:
+    def call(
+        self: Fn[Any, Callable[P, R]], staff: Staff, *args: P.args, **kwargs: P.kwargs
+    ) -> R:
         # FIXME: 什么时候去给 pyright 提个 issue 让 eric 彻底重构下现在 TypeVar binding 这坨狗屎。
         #
         #        无法将“type[str]”类型的参数分配给函数“call”中类型为“type[T@call]”的参数“value”
