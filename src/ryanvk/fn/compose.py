@@ -9,6 +9,7 @@ from typing import (
     Any,
     Callable,
     ClassVar,
+    Concatenate,
     Generator,
     Generic,
     Iterable,
@@ -18,12 +19,13 @@ from ryanvk._runtime import _upstream_staff
 from ryanvk._ordered_set import OrderedSet
 from ryanvk.fn.record import FnImplement
 from ryanvk.typing import (
-    CallShape,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
-    P,
-    R,
+    ImplementForCollect,
     Twin,
+    inP,
+    inR,
+    unspecifiedCollectP,
 )
 from ryanvk.overloads import SingletonOverload
 
@@ -59,7 +61,9 @@ class FnCompose(ABC):
         return FnImplement(self.fn)
 
     @contextmanager
-    def harvest(self: CallShape[P, R]) -> Generator[EntitiesHarvest[P, R], None, None]:
+    def harvest(
+        self: ImplementForCollect[unspecifiedCollectP]
+    ) -> Generator[EntitiesHarvest[unspecifiedCollectP], None, None]:
         harv = EntitiesHarvest(self.staff)  # type: ignore
         tok = EntitiesHarvest.mutation_endpoint.set(harv)
 
@@ -72,7 +76,7 @@ class FnCompose(ABC):
             EntitiesHarvest.mutation_endpoint.reset(tok)
 
 
-class EntitiesHarvest(Generic[P, R]):
+class EntitiesHarvest(Generic[unspecifiedCollectP]):
     mutation_endpoint: ClassVar[ContextVar[Self]] =\
         ContextVar("EntitiesHarvest.mutation_endpoint")  # fmt: off
 
@@ -100,7 +104,9 @@ class EntitiesHarvest(Generic[P, R]):
 
         return self._incompleted_result
 
-    def ensure_twin(self, twin: Twin) -> Callable[P, R]:
+    def ensure_twin(
+        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]], twin: Twin
+    ) -> Callable[inP, inR]:
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
@@ -110,14 +116,18 @@ class EntitiesHarvest(Generic[P, R]):
         else:
             instance = self.staff.instances[collector.cls]
 
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        def wrapper(*args: inP.args, **kwargs: inP.kwargs) -> inR:
             return implement(instance, *args, **kwargs)
 
         return wrapper
 
     @property
-    def first(self) -> Callable[P, R]:
-        return self.ensure_twin(next(iter(self.ensured_result)))
+    def first(
+        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]
+    ) -> Callable[inP, inR]:
+        return self.ensure_twin(self.ensured_result[0])
 
-    def iter_result(self) -> Iterable[Callable[P, R]]:
+    def iter_result(
+        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]
+    ) -> Iterable[Callable[inP, inR]]:
         return map(self.ensure_twin, self.ensured_result)

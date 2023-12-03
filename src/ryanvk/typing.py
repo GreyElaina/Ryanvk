@@ -32,6 +32,7 @@ unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
 specifiedCollectP = ParamSpec("specifiedCollectP")
 
 inRC = TypeVar("inRC", covariant=True, bound=Callable)
+inQC = TypeVar("inQC", contravariant=True, bound=Callable)
 inTC = TypeVar("inTC", bound=Callable)
 
 inQ = TypeVar("inQ", contravariant=True)
@@ -50,6 +51,13 @@ class SupportsMerge(Protocol):
 
 class CallShape(Protocol[P, R]):
     def call(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        ...
+
+
+class ImplementForCollect(Protocol[unspecifiedCollectP]):
+    def collect(
+        self, *args: unspecifiedCollectP.args, **kwargs: unspecifiedCollectP.kwargs
+    ) -> Any:
         ...
 
 

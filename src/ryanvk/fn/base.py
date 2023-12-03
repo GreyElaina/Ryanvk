@@ -54,8 +54,13 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
         class LocalCompose(Generic[outP, outR], FnCompose):
-            def call(self) -> FnComposeCallReturnType[Any]:
-                ...
+            def call(
+                self, *args: outP.args, **kwargs: outP.kwargs
+            ) -> FnComposeCallReturnType[outR]:
+                with self.harvest() as entities:
+                    yield self.singleton.call(None)
+
+                return entities.first(*args, **kwargs)
 
         return cls(LocalCompose)
 

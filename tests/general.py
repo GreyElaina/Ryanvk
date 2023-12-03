@@ -22,11 +22,10 @@ class TestPerform(m._):
         type = TypeOverload().as_agent()
         sim = SimpleOverload().as_agent()
 
-        def call(self, value: type[T]):
+        def call(self, value: type[T]) -> FnComposeCallReturnType[T]:
             with self.harvest() as entities:
                 yield self.sim.call(value)
 
-            #print(entities._incompleted_result)
             return entities.first(value)
 
         class ShapeCall(Protocol[T]):
