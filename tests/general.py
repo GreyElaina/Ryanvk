@@ -37,7 +37,6 @@ class TestPerform(m._):
             yield self.sim.collect(type)
 
     @m.entity
-    @Fn.compose
     @Fn.symmetric
     def test1(self, value: type[T]) -> T:
         ...

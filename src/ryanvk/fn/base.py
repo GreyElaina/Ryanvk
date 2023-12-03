@@ -59,8 +59,8 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
         self.compose_instance = compose_cls(self)
 
     @classmethod
-    def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
-        return FnSymmetricCompose[P, R]
+    def symmetric(cls: type[Fn[[Callable[P, R]], Callable[P, R]]], entity: Callable[Concatenate[Any, P], R]):
+        return cls(FnSymmetricCompose[P, R])
 
     @classmethod
     def compose(

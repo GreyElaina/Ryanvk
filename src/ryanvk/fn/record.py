@@ -66,8 +66,9 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
                 scope = scopes[name]
 
             target_set = fn_overload.collect(scope, sign)
-            if replacement is not None and replacement in target_set:
-                target_set.remove(replacement)
+            if replacement is not None:
+                if replacement in target_set:
+                    target_set.remove(replacement)
 
                 for k, v in record['entities'].items():
                     if v == replacement:
