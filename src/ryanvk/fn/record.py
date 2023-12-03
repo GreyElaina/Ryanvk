@@ -67,9 +67,17 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
 
             target_set = fn_overload.collect(scope, sign)
             if replacement is not None and replacement in target_set:
-                # print(replacement, target_set, replacement in target_set)
                 target_set.remove(replacement)
+
+                for k, v in record['entities'].items():
+                    if v == replacement:
+                        record['entities'][k] = replacement
+                        break
+                else:
+                    raise TypeError
+
             target_set.add(entity)
+            debug(target_set)
 
         record["entities"][frozenset(signature)] = entity
 

@@ -17,18 +17,6 @@ E = TypeVar("E")
 K = TypeVar("K")
 
 
-def _groupby(entities: Iterable[T], key: Callable[[T], K]) -> MutableMapping[K, list[T]]:
-    result = {}
-    for i in entities:
-        k = key(i)
-        if k not in result:
-            a = result[k] = []
-        else:
-            a = result[k]
-        a.append(i)
-    return result
-
-
 class Topic(Generic[T]):
     def merge(self, inbound: list[T], outbound: list[T]) -> None:
         ...
@@ -56,29 +44,45 @@ class PileTopic(Generic[T, S, E], Topic[T]):
     def merge(self, inbound: list[T], outbound: list[MutableMapping[Self, T]]) -> None:
         outbound_depth = len(outbound)
 
-        entities = chain(*[list(self.iter_entities(inbound_item).items()) for inbound_item in inbound])
-        for signature, group in _groupby(entities, key=lambda x: x[0]).items():
-            # group: list[(Signature, Entity / Twin)]
+        grouped: dict[S, list[E | None]] = {}
+
+        for record in inbound:
+            for identity, entity in self.iter_entities(record).items():
+                if identity in grouped:
+                    group = grouped[identity]
+                else:
+                    group = grouped[identity] = []
+                
+                group.append(entity)
+
+        for identity, group in grouped.items():
+            # identity: 标记 entity 用的，对于 fn 的情况，就是 overload 的 harvest 了
+            # group: list[E]
             outbound_index = 0
-            for group_inx in cycle(range(len(group))):
-                if group[group_inx] is None:
+            for group_index in cycle(range(len(group))):
+                entity = group[group_index]
+            
+                if entity is None:
                     break
 
-                _, entity = group[group_inx]
                 if outbound_index == outbound_depth:
                     outbound_depth += 1
                     outbound.append({self: self.new_record()})
 
-                if self.has_entity(outbound[outbound_index][self], signature):
-                    e = self.get_entity(outbound[outbound_index][self], signature)
-                    group[group_inx] = (signature, e)
-                    self.flatten_on(outbound[outbound_index][self], signature, entity, e)
+                if self not in outbound[outbound_index]:
+                    outbound[outbound_index][self] = self.new_record()
+
+                if self.has_entity(outbound[outbound_index][self], identity):
+                    e = self.get_entity(outbound[outbound_index][self], identity)
+                    group[group_index] = e
+                    self.flatten_on(outbound[outbound_index][self], identity, entity, e)
+                    # 这里其实发现一个问题：runtime 只有在第一次才会出现 replace ？这不符合我们的设计，所以一定是哪里出了问题。
+                    # 
                 else:
-                    group[group_inx] = None  # type: ignore
-                    self.flatten_on(outbound[outbound_index][self], signature, entity, None)
+                    group[group_index] = None
+                    self.flatten_on(outbound[outbound_index][self], identity, entity, None)
 
                 outbound_index += 1
-                # print(outbound_index, outbound_depth, key, group, i)
 
 
 def merge_topics_if_possible(

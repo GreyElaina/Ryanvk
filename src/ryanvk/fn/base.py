@@ -108,6 +108,7 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
     ) -> outR:
         # FIXME: 用类似我在 entities.first 上的思路修复这个。
         #        我没头绪了……似乎比我想象中难了太多，如果要在一步，甚至就地/零步里完成这个的话。
+
         # FIXME: 什么时候去给 pyright 提个 issue 让 eric 彻底重构下现在 TypeVar binding 这坨狗屎。
         #
         #        无法将“type[str]”类型的参数分配给函数“call”中类型为“type[T@call]”的参数“value”

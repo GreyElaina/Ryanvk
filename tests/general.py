@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable, Concatenate, Protocol, TypeVar, reveal_type
 
 from ryanvk.collector import BaseCollector
-from ryanvk.fn.base import Fn, t
+from ryanvk.fn.base import Fn
 from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.overload import FnOverload
 from ryanvk.overloads import TypeOverload, SimpleOverload
@@ -77,8 +77,8 @@ class TestPerformAlt2((n := BaseCollector())._):
     @n.entity
     @TestPerform.test1.implements()
     def test1_impl(self, value: type[str]) -> str:
-        print("symmetric tes2t")
-        return "星荧随挥舞而生，散落空中，颤颤作动。"
+        print("symmetric tes2t", self.test1_impl.super(value))
+        return "素月分辉，明河共影，表里俱澄澈。"
 
 a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
