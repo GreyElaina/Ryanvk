@@ -1,6 +1,6 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable, MutableMapping, TypedDict
 
 from ryanvk.topic import PileTopic
@@ -8,6 +8,7 @@ from ryanvk.typing import Twin
 
 if TYPE_CHECKING:
     from ryanvk.fn.overload import FnOverload
+
     from .base import Fn
 
 
@@ -21,9 +22,7 @@ class FnRecord(TypedDict):
 class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...], Twin]):
     fn: Fn
 
-    def iter_entities(
-        self, record: FnRecord
-    ) -> MutableMapping[frozenset[tuple[str, "FnOverload", Any]], Twin]:
+    def iter_entities(self, record: FnRecord) -> MutableMapping[frozenset[tuple[str, "FnOverload", Any]], Twin]:
         return record["entities"]
 
     def insist_objects(self, record: FnRecord) -> Iterable[Any]:
@@ -67,9 +66,10 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
                 scope = scopes[name]
 
             target_set = fn_overload.collect(scope, sign)
-            target_set.add(entity)
-            if replacement is not None:
+            if replacement is not None and replacement in target_set:
+                # print(replacement, target_set, replacement in target_set)
                 target_set.remove(replacement)
+            target_set.add(entity)
 
         record["entities"][frozenset(signature)] = entity
 

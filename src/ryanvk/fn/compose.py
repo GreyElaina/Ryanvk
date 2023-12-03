@@ -15,9 +15,11 @@ from typing import (
     Iterable,
     Self,
 )
-from ryanvk._runtime import _upstream_staff
+
 from ryanvk._ordered_set import OrderedSet
+from ryanvk._runtime import _upstream_staff
 from ryanvk.fn.record import FnImplement
+from ryanvk.overloads import SingletonOverload
 from ryanvk.typing import (
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
@@ -27,7 +29,6 @@ from ryanvk.typing import (
     inR,
     unspecifiedCollectP,
 )
-from ryanvk.overloads import SingletonOverload
 
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
@@ -98,15 +99,11 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
     @property
     def ensured_result(self):
         if not self.finished or self._incompleted_result is None:
-            raise LookupError(
-                "attempts to read result before its mutations all finished"
-            )
+            raise LookupError("attempts to read result before its mutations all finished")
 
         return self._incompleted_result
 
-    def ensure_twin(
-        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]], twin: Twin
-    ) -> Callable[inP, inR]:
+    def ensure_twin(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]], twin: Twin) -> Callable[inP, inR]:
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
@@ -122,12 +119,8 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         return wrapper
 
     @property
-    def first(
-        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]
-    ) -> Callable[inP, inR]:
+    def first(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]) -> Callable[inP, inR]:
         return self.ensure_twin(self.ensured_result[0])
 
-    def iter_result(
-        self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]
-    ) -> Iterable[Callable[inP, inR]]:
+    def iter_result(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]) -> Iterable[Callable[inP, inR]]:
         return map(self.ensure_twin, self.ensured_result)

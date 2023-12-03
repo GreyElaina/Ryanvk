@@ -48,9 +48,7 @@ class Staff:
             ...
 
     @overload
-    def inject(
-        self, perform_type: type[PostInitShape[P]], *args: P.args, **kwargs: P.kwargs
-    ) -> None:
+    def inject(self, perform_type: type[PostInitShape[P]], *args: P.args, **kwargs: P.kwargs) -> None:
         ...
 
     @overload
@@ -92,9 +90,7 @@ class Staff:
 
         start_offset = index + 1
         try:
-            for stack[-1], content in enumerate(
-                self.artifact_collections[start_offset:], start=start_offset
-            ):
+            for stack[-1], content in enumerate(self.artifact_collections[start_offset:], start=start_offset):
                 yield content
         finally:
             stack.pop()

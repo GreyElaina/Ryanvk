@@ -54,14 +54,10 @@ class FnOverloadAgent(Generic[On]):
         self.compose = fn
         self.fn_overload = overload
 
-    def collect(
-        self: FnOverloadAgent[FnOverload[Any, TCollectValue, Any]], value: TCollectValue
-    ):
+    def collect(self: FnOverloadAgent[FnOverload[Any, TCollectValue, Any]], value: TCollectValue):
         return FnOverloadHarvest(self.name, self.fn_overload, value)
 
-    def call(
-        self: FnOverloadAgent[FnOverload[Any, Any, TCallValue]], value: TCallValue
-    ):
+    def call(self: FnOverloadAgent[FnOverload[Any, Any, TCallValue]], value: TCallValue):
         return FnOverloadHarvest(self.name, self.fn_overload, value)
 
 

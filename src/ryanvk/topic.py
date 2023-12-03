@@ -1,13 +1,14 @@
 from __future__ import annotations
+
 from itertools import chain, cycle
 from typing import (
     Any,
     Callable,
+    Generic,
     Iterable,
     MutableMapping,
     Self,
     TypeVar,
-    Generic,
 )
 
 T = TypeVar("T")
@@ -16,9 +17,7 @@ E = TypeVar("E")
 K = TypeVar("K")
 
 
-def _groupby(
-    entities: Iterable[T], key: Callable[[T], K]
-) -> MutableMapping[K, list[T]]:
+def _groupby(entities: Iterable[T], key: Callable[[T], K]) -> MutableMapping[K, list[T]]:
     result = {}
     for i in entities:
         k = key(i)
@@ -51,20 +50,13 @@ class PileTopic(Generic[T, S, E], Topic[T]):
     def get_entity(self, record: T, signature: S) -> E:
         ...
 
-    def flatten_on(
-        self, record: T, signature: S, entity: E, replacement: E | None
-    ) -> None:
+    def flatten_on(self, record: T, signature: S, entity: E, replacement: E | None) -> None:
         ...
 
     def merge(self, inbound: list[T], outbound: list[MutableMapping[Self, T]]) -> None:
         outbound_depth = len(outbound)
 
-        entities = chain(
-            *[
-                list(self.iter_entities(inbound_item).items())
-                for inbound_item in inbound
-            ]
-        )
+        entities = chain(*[list(self.iter_entities(inbound_item).items()) for inbound_item in inbound])
         for signature, group in _groupby(entities, key=lambda x: x[0]).items():
             # group: list[(Signature, Entity / Twin)]
             outbound_index = 0
@@ -80,14 +72,10 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                 if self.has_entity(outbound[outbound_index][self], signature):
                     e = self.get_entity(outbound[outbound_index][self], signature)
                     group[group_inx] = (signature, e)
-                    self.flatten_on(
-                        outbound[outbound_index][self], signature, entity, e
-                    )
+                    self.flatten_on(outbound[outbound_index][self], signature, entity, e)
                 else:
                     group[group_inx] = None  # type: ignore
-                    self.flatten_on(
-                        outbound[outbound_index][self], signature, entity, None
-                    )
+                    self.flatten_on(outbound[outbound_index][self], signature, entity, None)
 
                 outbound_index += 1
                 # print(outbound_index, outbound_depth, key, group, i)

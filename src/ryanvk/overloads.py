@@ -18,9 +18,7 @@ class SimpleOverload(FnOverload[SimpleOverloadSignature, type[Any], Any]):
     def digest(self, collect_value: Any) -> SimpleOverloadSignature:
         return SimpleOverloadSignature(collect_value)
 
-    def collect(
-        self, scope: dict, signature: SimpleOverloadSignature
-    ) -> MutableSet[Twin]:
+    def collect(self, scope: dict, signature: SimpleOverloadSignature) -> MutableSet[Twin]:
         if signature.value not in scope:
             target = scope[signature.value] = OrderedSet()
         else:
@@ -34,9 +32,7 @@ class SimpleOverload(FnOverload[SimpleOverloadSignature, type[Any], Any]):
 
         return set()
 
-    def track(
-        self, scope: dict, signature: SimpleOverloadSignature
-    ) -> MutableSet[Twin]:
+    def track(self, scope: dict, signature: SimpleOverloadSignature) -> MutableSet[Twin]:
         return scope[signature]
 
 
@@ -49,9 +45,7 @@ class TypeOverload(FnOverload[TypeOverloadSignature, type[Any], Any]):
     def digest(self, collect_value: type) -> TypeOverloadSignature:
         return TypeOverloadSignature(collect_value)
 
-    def collect(
-        self, scope: dict, signature: TypeOverloadSignature
-    ) -> MutableSet[Twin]:
+    def collect(self, scope: dict, signature: TypeOverloadSignature) -> MutableSet[Twin]:
         if signature.type not in scope:
             target = scope[signature.type] = OrderedSet()
         else:
@@ -81,9 +75,7 @@ class SingletonOverload(FnOverload[None, None, None]):
     def digest(self, collect_value: None) -> _SingletonOverloadSignature:
         return SINGLETON_SIGN
 
-    def collect(
-        self, scope: dict, signature: _SingletonOverloadSignature
-    ) -> MutableSet[Twin]:
+    def collect(self, scope: dict, signature: _SingletonOverloadSignature) -> MutableSet[Twin]:
         s = scope[None] = set()
         return s
 

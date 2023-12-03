@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 import functools
-from typing import Callable, TypeVar
 from contextvars import copy_context
+from typing import Callable, TypeVar
 
 from ryanvk.typing import P, R
 

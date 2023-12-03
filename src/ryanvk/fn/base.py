@@ -2,21 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, TypeVar
 
+from ryanvk._runtime import _upstream_staff
 from ryanvk.entity import BaseEntity
 from ryanvk.fn.compose import EntitiesHarvest, FnCompose
-from ryanvk._runtime import _upstream_staff
 from ryanvk.fn.entity import FnImplementEntity
 from ryanvk.fn.record import FnRecord
 from ryanvk.typing import (
     FnComposeCallReturnType,
+    FnComposeCollectReturnType,
     P,
     R,
-    FnComposeCollectReturnType,
-    outP,
-    outR,
     inP,
     inR,
     inTC,
+    outP,
+    outR,
     specifiedCollectP,
     unspecifiedCollectP,
 )
@@ -31,7 +31,9 @@ outboundShape = TypeVar("outboundShape", bound=Callable, covariant=True)
 
 class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
     def call(
-        self, *args: outP.args, **kwargs: outP.kwargs
+        self,
+        *args: outP.args,
+        **kwargs: outP.kwargs,
     ) -> FnComposeCallReturnType[outR]:
         ...
 
@@ -54,15 +56,16 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
         class LocalCompose(Generic[outP, outR], FnCompose):
-            def call(
-                self, *args: outP.args, **kwargs: outP.kwargs
-            ) -> FnComposeCallReturnType[outR]:
+            def call(self, *args: outP.args, **kwargs: outP.kwargs) -> FnComposeCallReturnType[outR]:
                 with self.harvest() as entities:
                     yield self.singleton.call(None)
 
                 return entities.first(*args, **kwargs)
 
-        return cls(LocalCompose)
+            def collect(self, implement: Callable[outP, outR]) -> FnComposeCollectReturnType:
+                yield self.singleton.collect(None)
+
+        return LocalCompose[P, R]
 
     @classmethod
     def compose(
@@ -84,9 +87,7 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
         def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
             def inner(
                 impl: Callable[Concatenate[K, inP], inR]
-            ) -> FnImplementEntity[
-                Callable[Concatenate[K, inP], inR], specifiedCollectP
-            ]:
+            ) -> FnImplementEntity[Callable[Concatenate[K, inP], inR], specifiedCollectP]:
                 return FnImplementEntity(self, impl, *args, **kwargs)
 
             return inner
@@ -100,8 +101,13 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
         return wrapper  # type: ignore
 
     def call(
-        self: Fn[..., Callable[P, R]], staff: Staff, *args: P.args, **kwargs: P.kwargs
-    ) -> R:
+        self: Fn[..., Callable[outP, outR]],
+        staff: Staff,
+        *args: outP.args,
+        **kwargs: outP.kwargs,
+    ) -> outR:
+        # FIXME: 用类似我在 entities.first 上的思路修复这个。
+        #        我没头绪了……似乎比我想象中难了太多，如果要在一步，甚至就地/零步里完成这个的话。
         # FIXME: 什么时候去给 pyright 提个 issue 让 eric 彻底重构下现在 TypeVar binding 这坨狗屎。
         #
         #        无法将“type[str]”类型的参数分配给函数“call”中类型为“type[T@call]”的参数“value”

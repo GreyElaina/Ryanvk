@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from contextvars import ContextVar
-from typing import MutableMapping, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, MutableMapping
 
 if TYPE_CHECKING:
-    from .manager import MountpointProvider, LifespanManager
+    from .manager import LifespanManager, MountpointProvider
     from .staff import Staff
 
 targets_artifact_map: ContextVar[MutableMapping[Any, Any]]\

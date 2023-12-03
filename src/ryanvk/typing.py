@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
+    Generator,
     Protocol,
     TypeVar,
-    TYPE_CHECKING,
     runtime_checkable,
-    Generator,
 )
+
 from typing_extensions import ParamSpec, TypeAlias
 
 if TYPE_CHECKING:
@@ -55,9 +56,7 @@ class CallShape(Protocol[P, R]):
 
 
 class ImplementForCollect(Protocol[unspecifiedCollectP]):
-    def collect(
-        self, *args: unspecifiedCollectP.args, **kwargs: unspecifiedCollectP.kwargs
-    ) -> Any:
+    def collect(self, *args: unspecifiedCollectP.args, **kwargs: unspecifiedCollectP.kwargs) -> Any:
         ...
 
 

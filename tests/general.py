@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Any, Callable, Concatenate, Protocol, TypeVar
+
+from typing import Any, Callable, Concatenate, Protocol, TypeVar, reveal_type
 
 from ryanvk.collector import BaseCollector
-from ryanvk.fn.base import Fn
+from ryanvk.fn.base import Fn, t
 from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.overload import FnOverload
 from ryanvk.overloads import TypeOverload, SimpleOverload
@@ -35,12 +36,29 @@ class TestPerform(m._):
         def collect(self, implement: ShapeCall[T], *, type: type[T]):
             yield self.sim.collect(type)
 
+    @m.entity
+    @Fn.compose
+    @Fn.symmetric
+    def test1(self, value: type[T]) -> T:
+        ...
+
+reveal_type(TestPerform.test)
+reveal_type(TestPerform.test1)
 
 class TestPerformAlt((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
+
+    @n.entity
+    @TestPerform.test1.implements()
+    def test1_impl(self, value: type[str]) -> str:
+        print("symmetric test")
+        return "星荧随挥舞而生，散落空中，颤颤作动。"
+    
+    reveal_type(test_impl_int)
+    reveal_type(test1_impl)
 
 class TestPerformAlt1((n := BaseCollector())._):
     @n.entity
@@ -55,6 +73,12 @@ class TestPerformAlt2((n := BaseCollector())._):
     def test_impl_int(self, value: type[str]) -> str:
         print(self.test_impl_int.super(value))
         return "多层测试 - Alt2"
+
+    @n.entity
+    @TestPerform.test1.implements()
+    def test1_impl(self, value: type[str]) -> str:
+        print("symmetric tes2t")
+        return "星荧随挥舞而生，散落空中，颤颤作动。"
 
 a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
@@ -72,4 +96,7 @@ from devtools import debug
 
 #debug(a.artifact_collections)
 b = TestPerform.test.call1(a)(str)
-print("??", repr(b))
+c = TestPerform.test1.call1(a)(str)
+#d = TestPerform.test.call2(str)(str)
+
+print("??", repr(b), repr(c))

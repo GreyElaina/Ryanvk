@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from contextlib import AsyncExitStack, asynccontextmanager
-from typing import TYPE_CHECKING, Any, ClassVar, Generator, Callable, TypeVar
 import inspect
 import warnings
+from contextlib import AsyncExitStack, asynccontextmanager
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generator, TypeVar
 
 from ryanvk.topic import merge_topics_if_possible
+
 from ._runtime import targets_artifact_map
 
 if TYPE_CHECKING:
@@ -121,11 +122,7 @@ def namespace_generate(
                 if i.__native__:
                     continue
 
-                if (
-                    warn_for_accident_declare
-                    and not i.__collector__.upstream_target
-                    and i not in manually
-                ):
+                if warn_for_accident_declare and not i.__collector__.upstream_target and i not in manually:
                     warnings.warn(
                         f'{i.__module__}:{i.__name__} does not use the "upstream_target = True" setting.'
                         "It may have been imported accidentally or not yielded by this generator."

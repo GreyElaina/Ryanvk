@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Protocol, TYPE_CHECKING, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Protocol, TypeVar, overload
 
 if TYPE_CHECKING:
     from ryanvk.perform import BasePerform

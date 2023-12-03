@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TypedDict, NotRequired, Any
+
+from typing import Any, NotRequired, TypedDict
 
 from ryanvk.collector import BaseCollector
 from ryanvk.perform import BasePerform
@@ -39,8 +40,6 @@ class BaseEntity:
         @self.collector.on_collected
         def collected_callback(cls: type):
             if name in cls.__annotations__:
-                self.assign_callback(
-                    {"name": name, "annotation": cls.__annotations__[name]}
-                )
+                self.assign_callback({"name": name, "annotation": cls.__annotations__[name]})
             else:
                 self.assign_callback({"name": name})

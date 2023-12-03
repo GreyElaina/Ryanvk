@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
+
 from ._runtime import targets_artifact_map
 from .perform import BasePerform
 
