@@ -77,7 +77,6 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
                     raise TypeError
 
             target_set.add(entity)
-            debug(target_set)
 
         record["entities"][frozenset(signature)] = entity
 

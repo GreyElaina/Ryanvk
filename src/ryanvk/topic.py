@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from itertools import chain, cycle
+from itertools import cycle
 from typing import (
     Any,
-    Callable,
     Generic,
     Iterable,
     MutableMapping,
@@ -76,8 +75,6 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                     e = self.get_entity(outbound[outbound_index][self], identity)
                     group[group_index] = e
                     self.flatten_on(outbound[outbound_index][self], identity, entity, e)
-                    # 这里其实发现一个问题：runtime 只有在第一次才会出现 replace ？这不符合我们的设计，所以一定是哪里出了问题。
-                    # 
                 else:
                     group[group_index] = None
                     self.flatten_on(outbound[outbound_index][self], identity, entity, None)

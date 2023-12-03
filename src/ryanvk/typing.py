@@ -24,10 +24,6 @@ P1 = ParamSpec("P1")
 T1 = TypeVar("T1")
 T2 = TypeVar("T2")
 
-outP = ParamSpec("outP")
-outR = TypeVar("outR", covariant=True)
-inP = ParamSpec("inP")
-inR = TypeVar("inR", covariant=True)
 
 unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
 specifiedCollectP = ParamSpec("specifiedCollectP")

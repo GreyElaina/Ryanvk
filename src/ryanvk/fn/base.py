@@ -12,11 +12,7 @@ from ryanvk.typing import (
     FnComposeCollectReturnType,
     P,
     R,
-    inP,
-    inR,
     inTC,
-    outP,
-    outR,
     specifiedCollectP,
     unspecifiedCollectP,
 )
@@ -29,12 +25,12 @@ K = TypeVar("K")
 outboundShape = TypeVar("outboundShape", bound=Callable, covariant=True)
 
 
-class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
+class FnMethodComposeCls(Protocol[P, R, unspecifiedCollectP]):
     def call(
         self,
-        *args: outP.args,
-        **kwargs: outP.kwargs,
-    ) -> FnComposeCallReturnType[outR]:
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> FnComposeCallReturnType[R]:
         ...
 
     def collect(
@@ -45,49 +41,48 @@ class FnMethodComposeCls(Protocol[outP, outR, unspecifiedCollectP]):
         ...
 
 
+class FnSymmetricCompose(Generic[P, R], FnCompose):
+    def call(self, *args: P.args, **kwargs: P.kwargs) -> FnComposeCallReturnType[R]:
+        with self.harvest() as entities:
+            yield self.singleton.call(None)
+
+        return entities.first(*args, **kwargs)
+
+    def collect(self, implement: Callable[P, R]) -> FnComposeCollectReturnType:
+        yield self.singleton.collect(None)
+
+
 class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
     compose_instance: FnCompose
 
     def __init__(self, compose_cls: type[FnCompose]):
         self.compose_instance = compose_cls(self)
 
-    # TODO: Fn.symmetric based on Compose.
-    #       我严重怀疑这玩意实现不了。
     @classmethod
     def symmetric(cls, entity: Callable[Concatenate[Any, P], R]):
-        class LocalCompose(Generic[outP, outR], FnCompose):
-            def call(self, *args: outP.args, **kwargs: outP.kwargs) -> FnComposeCallReturnType[outR]:
-                with self.harvest() as entities:
-                    yield self.singleton.call(None)
-
-                return entities.first(*args, **kwargs)
-
-            def collect(self, implement: Callable[outP, outR]) -> FnComposeCollectReturnType:
-                yield self.singleton.collect(None)
-
-        return LocalCompose[P, R]
+        return FnSymmetricCompose[P, R]
 
     @classmethod
     def compose(
-        cls: type[Fn[unspecifiedCollectP, Callable[outP, outR]]],
-        compose_cls: type[FnMethodComposeCls[outP, outR, unspecifiedCollectP]],
+        cls: type[Fn[unspecifiedCollectP, Callable[P, R]]],
+        compose_cls: type[FnMethodComposeCls[P, R, unspecifiedCollectP]],
     ):
         return cls(compose_cls)  # type: ignore
 
     @property
     def implements(
-        self: Fn[Concatenate[Callable[inP, inR], specifiedCollectP], Any]
+        self: Fn[Concatenate[Callable[P, R], specifiedCollectP], Any]
     ) -> Callable[
         specifiedCollectP,
         Callable[
-            [Callable[Concatenate[K, inP], inR]],
-            FnImplementEntity[Callable[Concatenate[K, inP], inR], specifiedCollectP],
+            [Callable[Concatenate[K, P], R]],
+            FnImplementEntity[Callable[Concatenate[K, P], R], specifiedCollectP],
         ],
     ]:
         def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
             def inner(
-                impl: Callable[Concatenate[K, inP], inR]
-            ) -> FnImplementEntity[Callable[Concatenate[K, inP], inR], specifiedCollectP]:
+                impl: Callable[Concatenate[K, P], R]
+            ) -> FnImplementEntity[Callable[Concatenate[K, P], R], specifiedCollectP]:
                 return FnImplementEntity(self, impl, *args, **kwargs)
 
             return inner
@@ -101,11 +96,11 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
         return wrapper  # type: ignore
 
     def call(
-        self: Fn[..., Callable[outP, outR]],
+        self: Fn[..., Callable[P, R]],
         staff: Staff,
-        *args: outP.args,
-        **kwargs: outP.kwargs,
-    ) -> outR:
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> R:
         # FIXME: 用类似我在 entities.first 上的思路修复这个。
         #        我没头绪了……似乎比我想象中难了太多，如果要在一步，甚至就地/零步里完成这个的话。
 

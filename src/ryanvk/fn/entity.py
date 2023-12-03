@@ -8,7 +8,7 @@ from ryanvk.collector import BaseCollector
 from ryanvk.entity import BaseEntity
 from ryanvk.fn.record import FnRecord
 from ryanvk.perform import BasePerform
-from ryanvk.typing import inRC, outP, outR, specifiedCollectP
+from ryanvk.typing import P, R, inRC, specifiedCollectP
 
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
@@ -56,7 +56,9 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
 
         triples: set[tuple[str, FnOverload, Any]] = set()
 
-        for harvest_info in self.fn.compose_instance.collect(self.impl, *self._collect_args, **self._collect_kwargs):
+        for harvest_info in self.fn.compose_instance.collect(
+            self.impl, *self._collect_args, **self._collect_kwargs
+        ):
             sign = harvest_info.overload.digest(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             target_set = harvest_info.overload.collect(scope, sign)
@@ -69,10 +71,10 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
 
     @overload
     def __get__(
-        self: FnImplementEntity[Callable[Concatenate[Any, outP], outR], Any],
+        self: FnImplementEntity[Callable[Concatenate[Any, P], R], Any],
         instance: BasePerform,
         owner: type,
-    ) -> FnImplementEntityAgent[Callable[outP, outR]]:
+    ) -> FnImplementEntityAgent[Callable[P, R]]:
         ...
 
     @overload

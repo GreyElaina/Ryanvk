@@ -24,9 +24,9 @@ from ryanvk.typing import (
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
     ImplementForCollect,
+    P,
+    R,
     Twin,
-    inP,
-    inR,
     unspecifiedCollectP,
 )
 
@@ -103,7 +103,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
 
         return self._incompleted_result
 
-    def ensure_twin(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]], twin: Twin) -> Callable[inP, inR]:
+    def ensure_twin(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]], twin: Twin) -> Callable[P, R]:
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
@@ -113,14 +113,14 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         else:
             instance = self.staff.instances[collector.cls]
 
-        def wrapper(*args: inP.args, **kwargs: inP.kwargs) -> inR:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             return implement(instance, *args, **kwargs)
 
         return wrapper
 
     @property
-    def first(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]) -> Callable[inP, inR]:
+    def first(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Callable[P, R]:
         return self.ensure_twin(self.ensured_result[0])
 
-    def iter_result(self: EntitiesHarvest[Concatenate[Callable[inP, inR], ...]]) -> Iterable[Callable[inP, inR]]:
+    def iter_result(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Iterable[Callable[P, R]]:
         return map(self.ensure_twin, self.ensured_result)
