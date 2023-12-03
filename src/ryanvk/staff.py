@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 
 P = ParamSpec("P")
 R = TypeVar("R", covariant=True)
-VnCallable = TypeVar("VnCallable", bound=Callable)
 
 _iter_stack_collection = ContextVar[dict[Any, list[int]]]("_CurrentIterStack")
 
@@ -42,23 +41,6 @@ class Staff:
         self.components = components
         self.exit_stack = AsyncExitStack()
         self.instances = {}
-
-    class PostInitShape(Protocol[P]):
-        def __post_init__(self, *args: P.args, **kwargs: P.kwargs) -> Any:
-            ...
-
-    @overload
-    def inject(self, perform_type: type[PostInitShape[P]], *args: P.args, **kwargs: P.kwargs) -> None:
-        ...
-
-    @overload
-    def inject(self, perform_type: type[BasePerform]) -> None:
-        ...
-
-    def inject(self, perform_type: ..., *args, **kwargs):
-        perform = perform_type(self)
-        perform.__post_init__(*args, **kwargs)
-        self.artifact_collections.insert(0, perform.__collector__.artifacts)
 
     async def maintain(self, perform: BasePerform):
         await self.exit_stack.enter_async_context(perform.lifespan())
