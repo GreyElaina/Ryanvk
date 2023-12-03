@@ -87,16 +87,9 @@ merge_topics_if_possible([
     TestPerformAlt1.__collector__.artifacts
 ], a.artifact_collections)
 
-#a.artifact_collections = [
-#    TestPerformAlt2.__collector__.artifacts,
-#    TestPerformAlt1.__collector__.artifacts,
-#    TestPerformAlt.__collector__.artifacts
-#]
 from devtools import debug
 
-#debug(a.artifact_collections)
 b = TestPerform.test.call1(a)(str)
 c = TestPerform.test1.call1(a)(str)
-#d = TestPerform.test.call2(str)(str)
 
 print("??", repr(b), repr(c))

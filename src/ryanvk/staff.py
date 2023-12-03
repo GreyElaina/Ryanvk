@@ -3,15 +3,7 @@ from __future__ import annotations
 from contextlib import AsyncExitStack, asynccontextmanager
 from contextvars import ContextVar
 from copy import copy
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    MutableMapping,
-    Protocol,
-    TypeVar,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, MutableMapping, TypeVar
 
 from typing_extensions import ParamSpec
 

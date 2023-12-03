@@ -1,14 +1,7 @@
 from __future__ import annotations
 
 from itertools import cycle
-from typing import (
-    Any,
-    Generic,
-    Iterable,
-    MutableMapping,
-    Self,
-    TypeVar,
-)
+from typing import Any, Generic, Iterable, MutableMapping, Self, TypeVar
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -51,7 +44,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                     group = grouped[identity]
                 else:
                     group = grouped[identity] = []
-                
+
                 group.append(entity)
 
         for identity, group in grouped.items():
@@ -60,7 +53,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
             outbound_index = 0
             for group_index in cycle(range(len(group))):
                 entity = group[group_index]
-            
+
                 if entity is None:
                     break
 

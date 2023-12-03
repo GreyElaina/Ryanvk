@@ -17,7 +17,7 @@ from typing import (
 )
 
 from ryanvk._ordered_set import OrderedSet
-from ryanvk._runtime import _upstream_staff
+from ryanvk._runtime import upstream_staff
 from ryanvk.fn.record import FnImplement
 from ryanvk.overloads import SingletonOverload
 from ryanvk.typing import (
@@ -49,7 +49,7 @@ class FnCompose(ABC):
 
     @property
     def staff(self):
-        return _upstream_staff.get()
+        return upstream_staff.get()
 
     @abstractmethod
     def call(self) -> FnComposeCallReturnType[Any]:

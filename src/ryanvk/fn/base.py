@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, TypeVar
 
-from ryanvk._runtime import _upstream_staff
+from ryanvk._runtime import upstream_staff
 from ryanvk.entity import BaseEntity
 from ryanvk.fn.compose import EntitiesHarvest, FnCompose
 from ryanvk.fn.entity import FnImplementEntity
@@ -117,7 +117,7 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
                 record: FnRecord = artifacts[signature]
                 define = record["define"]
 
-                token = _upstream_staff.set(staff)
+                token = upstream_staff.set(staff)
                 try:
                     iters = define.compose_instance.call(*args, **kwargs)
                     harvest_info = next(iters)
@@ -131,6 +131,6 @@ class Fn(Generic[unspecifiedCollectP, outboundShape], BaseEntity):
                 except StopIteration as e:
                     return e.value
                 finally:
-                    _upstream_staff.reset(token)
+                    upstream_staff.reset(token)
         else:
             raise NotImplementedError

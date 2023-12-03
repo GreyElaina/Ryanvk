@@ -18,5 +18,6 @@ mountpoint_provider: ContextVar[MountpointProvider]\
 perform_manager: ContextVar[LifespanManager]\
     = ContextVar("perform_manager")  # fmt: off
 
-_upstream_staff: ContextVar[Staff]\
+
+upstream_staff: ContextVar[Staff]\
     = ContextVar("_StaffCtx")  # fmt: off
