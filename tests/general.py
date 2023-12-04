@@ -55,9 +55,7 @@ class TestPerformAlt((n := BaseCollector())._):
     def test1_impl(self, value: type[str]) -> str:
         print("symmetric test")
         return "星荧随挥舞而生，散落空中，颤颤作动。"
-    
-    reveal_type(test_impl_int)
-    reveal_type(test1_impl)
+
 
 class TestPerformAlt1((n := BaseCollector())._):
     @n.entity

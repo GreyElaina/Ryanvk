@@ -49,14 +49,16 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
             "entities": {},
         }
 
-    def flatten_on(
+    def flatten_record(self, record: FnRecord, target: FnRecord) -> None:
+        target['define'] = record['define']
+
+    def flatten_entity(
         self,
         record: FnRecord,
         signature: tuple[tuple[str, "FnOverload", Any], ...],
         entity: Twin,
         replacement: Twin | None,
     ) -> None:
-        # FIXME: 处理 fn_define
         scopes = record["overload_scopes"]
         for segment in signature:
             name, fn_overload, sign = segment
