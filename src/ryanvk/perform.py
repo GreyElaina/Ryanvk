@@ -22,6 +22,8 @@ class BasePerform:
     # and, be suggested, actually coding.
 
     __native__: ClassVar[bool] = False
+    # when a perform is native, its ALL collector-based functions will be disabled,
+    # the __collector__ attribute is unavailable too.
 
     __static__: ClassVar[bool] = True
     # when a perform is static, its lifespan won't execute,
