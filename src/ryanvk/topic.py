@@ -87,7 +87,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                     self.flatten_entity(target_record, identity, entity, None)
 
                 outbound_index += 1
-    
+
         for i in record_update_tasks[::-1]:
             i()
 

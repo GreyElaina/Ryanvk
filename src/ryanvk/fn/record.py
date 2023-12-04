@@ -50,7 +50,7 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
         }
 
     def flatten_record(self, record: FnRecord, target: FnRecord) -> None:
-        target['define'] = record['define']
+        target["define"] = record["define"]
 
     def flatten_entity(
         self,
@@ -72,9 +72,9 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
                 if replacement in target_set:
                     target_set.remove(replacement)
 
-                for k, v in record['entities'].items():
+                for k, v in record["entities"].items():
                     if v == replacement:
-                        record['entities'][k] = replacement
+                        record["entities"][k] = replacement
                         break
                 else:
                     raise TypeError

@@ -7,7 +7,6 @@ from typing import (
     Generator,
     Protocol,
     TypeVar,
-    runtime_checkable,
 )
 
 from typing_extensions import ParamSpec, TypeAlias
@@ -19,35 +18,16 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 R = TypeVar("R", covariant=True)
 P = ParamSpec("P")
-P1 = ParamSpec("P1")
-
-T1 = TypeVar("T1")
-T2 = TypeVar("T2")
-
 
 unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
 specifiedCollectP = ParamSpec("specifiedCollectP")
 
 inRC = TypeVar("inRC", covariant=True, bound=Callable)
-inQC = TypeVar("inQC", contravariant=True, bound=Callable)
 inTC = TypeVar("inTC", bound=Callable)
-
-inQ = TypeVar("inQ", contravariant=True)
 
 
 class SupportsCollect(Protocol[P, R]):
     def collect(self, collector: Any, *args: P.args, **kwargs: P.kwargs) -> R:
-        ...
-
-
-@runtime_checkable
-class SupportsMerge(Protocol):
-    def merge(self, *records: dict):
-        ...
-
-
-class CallShape(Protocol[P, R]):
-    def call(self, *args: P.args, **kwargs: P.kwargs) -> R:
         ...
 
 

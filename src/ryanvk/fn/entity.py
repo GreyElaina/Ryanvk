@@ -56,9 +56,7 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
 
         triples: set[tuple[str, FnOverload, Any]] = set()
 
-        for harvest_info in self.fn.compose_instance.collect(
-            self.impl, *self._collect_args, **self._collect_kwargs
-        ):
+        for harvest_info in self.fn.compose_instance.collect(self.impl, *self._collect_args, **self._collect_kwargs):
             sign = harvest_info.overload.digest(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             target_set = harvest_info.overload.collect(scope, sign)
