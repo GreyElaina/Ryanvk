@@ -7,6 +7,7 @@ from ryanvk.perform import BasePerform
 
 
 class EntityAssignInfo(TypedDict):
+    cls: NotRequired[type]
     name: NotRequired[str]
     annotation: NotRequired[Any]
 
@@ -40,6 +41,6 @@ class BaseEntity:
         @self.collector.on_collected
         def collected_callback(cls: type):
             if name in cls.__annotations__:
-                self.assign_callback({"name": name, "annotation": cls.__annotations__[name]})
+                self.assign_callback({"cls": cls, "name": name, "annotation": cls.__annotations__[name]})
             else:
-                self.assign_callback({"name": name})
+                self.assign_callback({"cls": cls, "name": name})

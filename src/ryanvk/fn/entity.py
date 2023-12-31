@@ -9,19 +9,18 @@ from ryanvk.entity import BaseEntity
 from ryanvk.fn.record import FnRecord
 from ryanvk.perform import BasePerform
 from ryanvk.typing import P, R, inRC, specifiedCollectP
-
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
     from ryanvk.fn.overload import FnOverload
 
 
 class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
-    fn: Fn[Concatenate[Any, specifiedCollectP], Any]
+    fn: Fn[Callable[Concatenate[Any, specifiedCollectP], Any], Any]
     impl: Callable[..., Any]
 
     def __init__(
         self: FnImplementEntity[inRC, specifiedCollectP],
-        fn: Fn[Concatenate[Any, specifiedCollectP], Any],
+        fn: Fn[Callable[Concatenate[Any, specifiedCollectP], Any], Any],
         impl: inRC,
         *args: specifiedCollectP.args,
         **kwargs: specifiedCollectP.kwargs,
@@ -95,10 +94,6 @@ class FnImplementEntityAgent(Generic[inRC]):
         self.entity = entity
 
     @property
-    def staff(self):
-        return self.perform.staff
-
-    @property
     def __call__(self) -> inRC:
         def wrapper(*args, **kwargs):
             return self.entity.impl(self.perform, *args, **kwargs)
@@ -107,7 +102,4 @@ class FnImplementEntityAgent(Generic[inRC]):
 
     @property
     def super(self) -> inRC:
-        def wrapper(*args, **kwargs):
-            return self.entity.fn.call(self.staff, *args, **kwargs)
-
-        return wrapper  # type: ignore
+        return self.entity.fn.callee

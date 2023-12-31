@@ -5,7 +5,7 @@
 groups = ["default", "dev", "orderedset"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:da8a3dda81a56825a7856ec7dd972ff464e25c5827c63f979c25070d1fd0a4e1"
+content_hash = "sha256:c0783b2b2b29c30f6587281f732f10d0069d0aa9fe5558832bd6b741fda31597"
 
 [[package]]
 name = "appnope"
@@ -353,6 +353,42 @@ summary = "Pygments is a syntax highlighting package written in Python."
 files = [
     {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
     {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
+]
+
+[[package]]
+name = "pylyzer"
+version = "0.0.51"
+requires_python = ">=3.7"
+summary = "A static code analyzer & language server for Python"
+files = [
+    {file = "pylyzer-0.0.51-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:b2db0fa559c87808e67038b4fa1827b48fcc35d6673b20eda505cf3567d86b1a"},
+    {file = "pylyzer-0.0.51-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1d6da57e352f834292150780091b7d377135793259e5a268dae8155311bf98ca"},
+    {file = "pylyzer-0.0.51-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8c59b38067b43391182e928a58ed74f3af012313b014326e50bc0406570ffd0a"},
+    {file = "pylyzer-0.0.51-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:0e58fb64b92513bdb38380f941da901beda0e197f205c0ac09538607e29be190"},
+    {file = "pylyzer-0.0.51-cp311-cp311-win32.whl", hash = "sha256:609c3e53cdddc585fd899176308d343386c604c55b11e05dc6126f636119889a"},
+    {file = "pylyzer-0.0.51-cp311-cp311-win_amd64.whl", hash = "sha256:4c6214da71b4abe7800c47a539ca1ae52e6b51737a81f3a847aecae9e4cef148"},
+    {file = "pylyzer-0.0.51-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:a684e6374f3f8555c052b5557d32b1c638d102312347b5ece1e278353e8b3af5"},
+    {file = "pylyzer-0.0.51-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f15282ed6a78df3f8b22c413d1adc0e10ce05bebf8285782de149bc6e955555c"},
+    {file = "pylyzer-0.0.51-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dbb02593c25eb325f6dc13997ca0fd75d63d267b6dda2083eb6fd3855b65ff06"},
+    {file = "pylyzer-0.0.51-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:98e7d45a3099dfb092832154f495c471d6189750d133e84372677525e63144d3"},
+    {file = "pylyzer-0.0.51-cp312-cp312-win32.whl", hash = "sha256:b09adaccbfe0db36bd3ed35c16b92dc54eb6fc43d7bac5186ee00cafb9481e5f"},
+    {file = "pylyzer-0.0.51-cp312-cp312-win_amd64.whl", hash = "sha256:e573b2a23eedc909aa501190ab2e23e8e850f9acfd48a3d34c23d9d3e6c3aec5"},
+    {file = "pylyzer-0.0.51-pp310-pypy310_pp73-macosx_10_9_x86_64.whl", hash = "sha256:3de00e3a0a10561459c78c6187a9ab43b580988a041178a1f5605397c1f5afdb"},
+    {file = "pylyzer-0.0.51-pp310-pypy310_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:65971f6307a2c87fff6b263fec4ee3d863ef5a60f7c75f2f94ba31ae3562415b"},
+    {file = "pylyzer-0.0.51-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c334f5a3961b6563e91bea380cef5d393b19faac23af1f6b6c2b8351068d2538"},
+    {file = "pylyzer-0.0.51-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:fa3a5995803c7473725286167060f6b977b6aa0cdb387e680600670f2a34ae20"},
+    {file = "pylyzer-0.0.51-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:26bfc61d158b844cd5f18d40e3b72dbfac4112ef359d20f4a110179909ea79bd"},
+    {file = "pylyzer-0.0.51-pp37-pypy37_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7273f9003ce524a12aad99aec9b05b42cc82e5e8d8aa65bbb7ef7f5c92d40083"},
+    {file = "pylyzer-0.0.51-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5d4e9db769d198ef104a97cce6eefd3c728558a4936aa7da134bfffd371d88fc"},
+    {file = "pylyzer-0.0.51-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:d981a4a61ad6c787b6b37a6134e72e7d62838cb3e8903a731a73d6334b6bcfc8"},
+    {file = "pylyzer-0.0.51-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:468f7b823463db60bfce43ff319989f9796adbcb17200788880cf9c5f38bda05"},
+    {file = "pylyzer-0.0.51-pp38-pypy38_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ffe00143229ae38092efde9f1956509c890c4b30c58347540b55fe7f4c4fbdad"},
+    {file = "pylyzer-0.0.51-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2b4ed01a2f88ec1b3ad9dc285b27165800f6826e63c2b45af38485b260a17753"},
+    {file = "pylyzer-0.0.51-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:7c46b75a5e9475c5850a3cd1d22b9edc74de70ab79cafcf8c04becdb3a8c7027"},
+    {file = "pylyzer-0.0.51-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:e5e9f1933c5121ceaf9da139bcacecff16e02bfd9fdb3d0ec403136a63517687"},
+    {file = "pylyzer-0.0.51-pp39-pypy39_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:b3821a81befb99847bc9e3c4924495f5c9edcd6ac484b2d7ee1cb22128d4e234"},
+    {file = "pylyzer-0.0.51-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:51156a7d337ddad783bc593d450763a620e6698c66590201de62a0d0f0da5578"},
+    {file = "pylyzer-0.0.51-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:800ca8b059b5d9dcd9a9c85a74a81aecca1c88b49f04d6fc807a8e45c3459c1f"},
 ]
 
 [[package]]

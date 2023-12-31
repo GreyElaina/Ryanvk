@@ -10,8 +10,6 @@ from ryanvk.topic import merge_topics_if_possible
 from ._runtime import targets_artifact_map
 
 if TYPE_CHECKING:
-    from ryanvk.staff import Staff
-
     from .collector import BaseCollector
 
 
@@ -30,10 +28,7 @@ class BasePerform:
     # which means dynamic endpoint cannot be used in the perform.
     # and could be used in a widen context safely.
 
-    staff: Staff
-
-    def __init__(self, staff: Staff) -> None:
-        self.staff = staff
+    __no_warn__: ClassVar[bool] = False
 
     def __post_init__(self):
         ...
@@ -41,13 +36,6 @@ class BasePerform:
     @classmethod
     def apply_to(cls, map: dict[Any, Any]):
         map.update(cls.__collector__.artifacts)
-
-    @asynccontextmanager
-    async def lifespan(self):
-        async with AsyncExitStack() as stack:
-            # TODO: entity lifespan manage entry
-            # 设计中，所有的 Perform 都需要在 Staff 中预先通过 maintain 获取实例；可以预先初始化一些给 Staff 用。
-            yield self
 
     @classmethod
     def __post_collected__(cls, collect: BaseCollector):
@@ -57,14 +45,12 @@ class BasePerform:
         cls,
         *,
         keep_native: bool = False,
-        static: bool = True,
     ) -> None:
         cls.__native__ = keep_native
         if keep_native:
             return
 
         collector = cls.__collector__
-        cls.__static__ = static
 
         for i in collector.collected_callbacks:
             i(cls)
@@ -115,7 +101,7 @@ def namespace_generate(
             if inspect.isgeneratorfunction(func):
                 for i in func():
                     manually.add(i)
-                    merge_topics_if_possible([i.__collector__.artifacts], [namespace])
+                    merge_topics_if_possible([i.__collector__.artifacts], [namespace])  # type: ignore
         finally:
             targets_artifact_map.reset(token)
 
@@ -124,22 +110,11 @@ def namespace_generate(
                 if i.__native__:
                     continue
 
-                if warn_for_accident_declare and not i.__collector__.upstream_target and i not in manually:
+                if warn_for_accident_declare and not i.__collector__.upstream_target and not i.__no_warn__ and i not in manually:
                     warnings.warn(
                         f'{i.__module__}:{i.__name__} does not use the "upstream_target = True" setting.'
                         "It may have been imported accidentally or not yielded by this generator."
                         "Both scenarios are likely unintended. Please have a developer review this.",
-                        ImportWarning,
-                    )
-
-                if warn_for_non_static and not i.__static__:
-                    warnings.warn(
-                        f"{i.__module__}:{i.__name__} declares (m := ..., static=False), "
-                        "which enabled perform lifespan feature."
-                        "It means ALL resources depends on lifespan feature WILL NOT WORKING, "
-                        "because namespace_generate won't record these performs to be ensured "
-                        "then Staff won't handle these performs. This behavior is designed currently. "
-                        "Please have a developer review this.",
                         ImportWarning,
                     )
 

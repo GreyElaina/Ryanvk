@@ -83,9 +83,6 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
 
         record["entities"][frozenset(signature)] = entity
 
-
-# TODO: 弃用 Harvest，因为让我很烦。
-# 只要只是在 ExtControl 和 Call/Collect Body 之间传递就好，先 make it work.
 @dataclass(eq=True, frozen=True)
 class FnOverloadHarvest:
     name: str

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import cycle
-from typing import Any, Generic, Iterable, MutableMapping, Self, TypeVar
+from typing import Any, Generic, Iterable, MutableMapping, MutableSequence, Self, TypeVar
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -10,7 +10,7 @@ K = TypeVar("K")
 
 
 class Topic(Generic[T]):
-    def merge(self, inbound: list[T], outbound: list[T]) -> None:
+    def merge(self, inbound: MutableSequence[T], outbound: MutableSequence[T]) -> None:
         ...
 
     def new_record(self) -> T:
@@ -19,9 +19,6 @@ class Topic(Generic[T]):
 
 class PileTopic(Generic[T, S, E], Topic[T]):
     def iter_entities(self, record: T) -> MutableMapping[S, E]:
-        ...
-
-    def insist_objects(self, record: T) -> Iterable[Any]:
         ...
 
     def has_entity(self, record: T, signature: S) -> bool:
@@ -93,8 +90,8 @@ class PileTopic(Generic[T, S, E], Topic[T]):
 
 
 def merge_topics_if_possible(
-    inbounds: list[MutableMapping[Any, Any]],
-    outbound: list[MutableMapping[Any, Any]],
+    inbounds: MutableSequence[MutableMapping[Any, Any]],
+    outbound: MutableSequence[MutableMapping[Any, Any]],
     *,
     replace_non_topic: bool = True,
 ) -> None:
