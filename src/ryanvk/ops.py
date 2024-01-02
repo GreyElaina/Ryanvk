@@ -1,21 +1,25 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, MutableMapping, MutableSequence
 
-from ._runtime import Layout, Instances, AccessStack, GlobalArtifacts
 from contextlib import contextmanager
-from .utilles import standalone_context
+from typing import TYPE_CHECKING, Any, MutableMapping
+
+from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from .typing import inTC
+from .utilles import standalone_context
 
 if TYPE_CHECKING:
-    from .fn.base import Fn
     from ryanvk.fn.record import FnRecord
+
+    from .fn.base import Fn
 
 
 def layout():
     return Layout.get(None) or [GlobalArtifacts]
 
+
 def shallow():
     return layout()[0]
+
 
 @contextmanager
 def isolate(*collections: MutableMapping[Any, Any]):
@@ -24,6 +28,7 @@ def isolate(*collections: MutableMapping[Any, Any]):
         yield
     finally:
         Layout.reset(token)
+
 
 def instances(*, context: bool = False) -> MutableMapping[type, Any]:
     context_value = Instances.get(None)
@@ -62,7 +67,7 @@ def callee_of(fn: Fn[Any, inTC]) -> inTC:
                 record: FnRecord = artifacts[signature]
                 define = record["define"]
 
-                #token = upstream_staff.set(staff)
+                # token = upstream_staff.set(staff)
                 try:
                     iters = define.compose_instance.call(*args, **kwargs)
                     harvest_info = next(iters)
@@ -76,12 +81,13 @@ def callee_of(fn: Fn[Any, inTC]) -> inTC:
                 except StopIteration as e:
                     return e.value
                 finally:
-                    #upstream_staff.reset(token)
+                    # upstream_staff.reset(token)
                     ...
         else:
             raise NotImplementedError
 
     return wrapper  # type: ignore
+
 
 @standalone_context
 def iter_artifacts(key: Any | None = None):

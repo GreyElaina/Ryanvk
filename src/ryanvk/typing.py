@@ -4,9 +4,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Concatenate,
     Generator,
-    Generic,
     Protocol,
     TypeVar,
 )
@@ -36,37 +34,19 @@ class SupportsCollect(Protocol[P, R]):
         ...
 
 
-class ImplementForCollect(Protocol[inRC]):
-    @property
-    def collect(self) -> inRC:
+class ImplementForCollect(Protocol[unspecifiedCollectP]):
+    def collect(self, *args: unspecifiedCollectP.args, **kwargs: unspecifiedCollectP.kwargs) -> Any:
         ...
+
 
 class WrapCall(Protocol[P, R]):
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         ...
 
-class AsCall(Protocol[R]):
-    def __call__(self: AsCall[Callable[P, R1]], *args: P.args, **kwds: P.kwargs) -> R1:
-        ...
-        
-class Detour1(Protocol[R1]):
-    def __call__(self: Detour1[Callable[P, Any]]) -> Callable[P, Any]:
-        ...
 
-class DbgSlot(Generic[R]):
-    # NOTE: R => Callable[[], inTC] -> inTC 会因为无法对 inTC 进行 overload-transform 导致崩溃。
-    # NOTE:
-    def test(self: DbgSlot[Callable[[], inTC]]) -> DbgSlot[inTC]:
-        ...
-
-    # NOTE: 这样无法将 TypeVar 转换为可用的，而之前的处理办法是 `Fn[callShape]` (Fn.call)，很显然，不太能直接套用到此例中。
-    # NOTE: 毕竟如果这个 made it works 了，那么之前 Fn.call 就能修的能用了。
-    # NOTE: 要不丢 TypeVar mapping，要不崩 pyright，选一个吧（笑）
-    #       我都不选。
-    def test1(self: DbgSlot[inTC]) -> inTC:
-        ...
-
-    def __call__(self: DbgSlot[Callable[P, R1]], *args: P.args, **kwargs: P.kwargs) -> R1:
+class ExplictImplementShape(Protocol[inRC]):
+    @property
+    def implement_sample(self) -> inRC:
         ...
 
 

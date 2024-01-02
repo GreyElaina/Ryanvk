@@ -37,8 +37,6 @@ class TestPerform(m._):
             with self.harvest() as entities:
                 yield self.sim.call(value)
 
-            #reveal_type(entities.first1()(value))
-            reveal_type(entities.first1().test().test1()(value))
             return entities.first(value)
 
         class ShapeCall(Protocol[T]):
@@ -60,7 +58,12 @@ class TestPerform(m._):
         def collect(self, implement: ShapeCall[T], *, type: type[T]):
             yield self.sim.collect(type)
 
+        @staticmethod
+        def implement_sample(value: type[T]) -> T: ...
+ 
 reveal_type(TestPerform.test)
+reveal_type(TestPerform.test.__class__.implements)
+reveal_type(TestPerform.test.implements)
 reveal_type(TestPerform.test.implements(type=str))
 reveal_type(TestPerform.test.implements(type=list[str]).__call__)
 
@@ -69,8 +72,6 @@ class TestPerformAlt((n := BaseCollector())._):
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
-    
-    reveal_type(test_impl_int)
 
 with isolate():
     from devtools import debug

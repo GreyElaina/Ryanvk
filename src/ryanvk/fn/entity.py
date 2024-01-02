@@ -9,6 +9,7 @@ from ryanvk.entity import BaseEntity
 from ryanvk.fn.record import FnRecord
 from ryanvk.perform import BasePerform
 from ryanvk.typing import P, R, inRC, specifiedCollectP
+
 if TYPE_CHECKING:
     from ryanvk.fn.base import Fn
     from ryanvk.fn.overload import FnOverload

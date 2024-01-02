@@ -2,37 +2,29 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, Self, TypeVar, overload
 
-from ryanvk.collector import BaseCollector
-from ryanvk.entity import BaseEntity, EntityAssignInfo
-from ryanvk.fn.compose import EntitiesHarvest, FnCompose
+from ryanvk.entity import BaseEntity
+from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.entity import FnImplementEntity
-from ryanvk.fn.record import FnRecord
 from ryanvk.ops import callee_of
 from ryanvk.typing import (
+    P1,
+    R1,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
     P,
-    P1,
     R,
-    R1,
     WrapCall,
     inTC,
-    inRC,
-    T,
     specifiedCollectP,
-    unspecifiedCollectP,
 )
 
 if TYPE_CHECKING:
-    from ryanvk.perform import BasePerform
+    pass
 
 K = TypeVar("K")
 
 callShape = TypeVar("callShape", bound=Callable, covariant=True)
 collectShape = TypeVar("collectShape", bound=Callable, covariant=True)
-
-outboundShape = TypeVar("outboundShape", bound=Callable, covariant=True)
-
 
 class FnMethodComposeCls(Protocol[collectShape, callShape]):
     @property
@@ -54,18 +46,11 @@ class FnSymmetricCompose(Generic[inTC], FnCompose):
     def collect(self, implement: inTC) -> FnComposeCollectReturnType:
         yield self.singleton.collect(None)
 
+
 class Detour(Protocol[R, specifiedCollectP]):
     def __call__(
         self: Detour[WrapCall[..., Callable[P1, R1]], specifiedCollectP], implement: Callable[Concatenate[K, P1], R1]
     ) -> FnImplementEntity[Callable[Concatenate[K, P1], R1], specifiedCollectP]:
-        ...
-
-class DetourPlus(Protocol[inRC]):
-    def __call__(self: DetourPlus[Callable[Concatenate[Any, P], R]], implement: Callable[P, R]):
-        ...
-
-class DetourPlus1(Protocol[inRC]):
-    def __call__(self: DetourPlus1[Callable[Concatenate[Any, P], R]], *args: P.args, **kwargs: P.kwargs) -> R:
         ...
 
 
@@ -76,11 +61,7 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
         self.compose_instance = compose_cls(self)
 
     @classmethod
-    def symmetric(
-        cls: type[Fn[DetourPlus[inTC], DetourPlus1[inTC]]], entity: inTC
-    ):
-        # 有个问题：这里必须拆 Callable，然后拆就会丢 TypeVar bindings.
-        # 难崩，看看能不能 Protocol.__call__ + self-casting 解决。
+    def symmetric(cls: type[Fn[Callable[[inTC], Any], inTC]], entity: inTC):
         return cls(FnSymmetricCompose[inTC])
 
     @classmethod
@@ -98,8 +79,8 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
 
     @property
     def implements(
-        self: Fn[Callable[Concatenate[T, specifiedCollectP], Any], Any]
-    ) -> Callable[specifiedCollectP, Detour[WrapCall[..., T], specifiedCollectP]]:
+        self: Fn[Callable[Concatenate[inTC, specifiedCollectP], Any], Any]
+    ) -> Callable[specifiedCollectP, Detour[WrapCall[..., inTC], specifiedCollectP]]:
         def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
             def inner(impl: Callable[Concatenate[K, P], R]):
                 return FnImplementEntity(self, impl, *args, **kwargs)
@@ -111,5 +92,3 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
     @property
     def callee(self):
         return callee_of(self)
-
-    # TODO: check for completed implementations

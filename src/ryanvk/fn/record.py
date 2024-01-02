@@ -83,6 +83,7 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
 
         record["entities"][frozenset(signature)] = entity
 
+
 @dataclass(eq=True, frozen=True)
 class FnOverloadHarvest:
     name: str

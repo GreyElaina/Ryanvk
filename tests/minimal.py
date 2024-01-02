@@ -40,6 +40,8 @@ class TestPerformAlt((n := BaseCollector())._):
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
+    
+    reveal_type(TestPerform.test.implements)
 
 with isolate():
     from devtools import debug

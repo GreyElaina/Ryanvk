@@ -7,7 +7,7 @@ from ryanvk.fn.base import Fn
 from ryanvk.fn.compose import FnCompose
 from ryanvk.fn.overload import FnOverload
 from ryanvk.overloads import TypeOverload, SimpleOverload
-from ryanvk.typing import FnComposeCallReturnType, P, R
+from ryanvk.typing import FnComposeCallReturnType, P, R, inTC, P1, R1
 from ryanvk.ops import isolate, layout
 from ryanvk.topic import merge_topics_if_possible
 
@@ -37,13 +37,17 @@ class TestPerform(m._):
 
     @m.entity
     @Fn.symmetric
-    def test1(self, value: type[T]) -> T:
+    @staticmethod
+    def test1(value: type[T]) -> T:
         ...
+
 
 reveal_type(TestPerform.test)
 reveal_type(TestPerform.test.implements)
 reveal_type(TestPerform.test.implements(type=str))
 reveal_type(TestPerform.test1)
+
+
 
 class TestPerformAlt((n := BaseCollector())._):
     @n.entity
@@ -52,7 +56,7 @@ class TestPerformAlt((n := BaseCollector())._):
         return "手杖闷闷作响，空气振振有声。"
 
     @n.entity
-    @TestPerform.test1.implements()
+    @TestPerform.test1.implements()  # type: ignore
     def test1_impl(self, value: type[str]) -> str:
         print("symmetric test")
         return "星荧随挥舞而生，散落空中，颤颤作动。"
@@ -81,7 +85,7 @@ class TestPerformAlt2((n := BaseCollector())._):
     reveal_type(TestPerform.test)
     reveal_type(TestPerform.test1)
     reveal_type(TestPerform.test.implements)
-    reveal_type(TestPerform.test1.implements()(test1_impl))
+    reveal_type(TestPerform.test1.implements())
 
 #a = Staff([TestPerformAlt.__collector__.artifacts], {})
 

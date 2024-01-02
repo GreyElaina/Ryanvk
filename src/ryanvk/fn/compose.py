@@ -10,10 +10,11 @@ from typing import (
     Callable,
     ClassVar,
     Concatenate,
-    Generator,
+    ContextManager,
     Generic,
     Iterable,
     Self,
+    overload,
 )
 
 from ryanvk._ordered_set import OrderedSet
@@ -21,19 +22,15 @@ from ryanvk.fn.record import FnImplement
 from ryanvk.ops import instances
 from ryanvk.overloads import SingletonOverload
 from ryanvk.typing import (
-    Detour1,
+    ExplictImplementShape,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
     ImplementForCollect,
     P,
-    T,
     R,
     Twin,
-    WrapCall,
-    inRC,
+    inTC,
     unspecifiedCollectP,
-    specifiedCollectP,
-    inTC, DbgSlot
 )
 
 if TYPE_CHECKING:
@@ -62,28 +59,27 @@ class FnCompose(ABC):
     def signature(self):
         return FnImplement(self.fn)
 
-    # TODO: 使用 pyright#6822 中的一些未成系统的技巧输出 Overload Callable.
-    @property
-    def harvest(
-        self: ImplementForCollect[inTC]
-    ):
-        @contextmanager
-        def wrapper() -> Generator[EntitiesHarvest[inTC], None, None]:
-            harv = EntitiesHarvest()
-            tok = EntitiesHarvest.mutation_endpoint.set(harv)
+    @overload
+    def harvest(self: ExplictImplementShape[inTC]) -> ContextManager[EntitiesHarvest[inTC]]:
+        ...
 
-            try:
-                yield harv
-            finally:
-                harv.finished = True
-                EntitiesHarvest.mutation_endpoint.reset(tok)
-        
-        return wrapper
+    @overload
+    def harvest(self: ImplementForCollect[unspecifiedCollectP]) -> ContextManager[EntitiesHarvest[unspecifiedCollectP]]:
+        ...
+
+    @contextmanager
+    def harvest(self):
+        harv = EntitiesHarvest()
+        tok = EntitiesHarvest.mutation_endpoint.set(harv)
+
+        try:
+            yield harv
+        finally:
+            harv.finished = True
+            EntitiesHarvest.mutation_endpoint.reset(tok)
 
 
-
-
-class EntitiesHarvest(Generic[inRC]):
+class EntitiesHarvest(Generic[unspecifiedCollectP]):
     mutation_endpoint: ClassVar[ContextVar[Self]] =\
         ContextVar("EntitiesHarvest.mutation_endpoint")  # fmt: off
 
@@ -120,15 +116,9 @@ class EntitiesHarvest(Generic[inRC]):
 
         return wrapper  # type: ignore
 
-    # 这里必须依赖于 `overload-transforming` 这个行为。
-    # 我突然感觉我提的那个 issue 最后又会被 as designed 了。
-
-    def first1(self: EntitiesHarvest[Callable[Concatenate[T, specifiedCollectP], Any]]) -> DbgSlot[Callable[[], T]]:
-        ...
-
     @property
-    def first(self: EntitiesHarvest[Callable[Concatenate[WrapCall[P, R], specifiedCollectP], Any]]) -> Callable[specifiedCollectP, Callable[[WrapCall[P ,R]], Any]]:
-        return self.ensure_twin(self.ensured_result[0])
+    def first(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Callable[P, R]:
+        return self.ensure_twin(self.ensured_result[0])  # type: ignore
 
-    def iter_result(self: EntitiesHarvest[Concatenate[inTC, ...]]) -> Iterable[inTC]:
-        return map(self.ensure_twin, self.ensured_result)
+    def iter_result(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Iterable[Callable[P, R]]:
+        return map(self.ensure_twin, self.ensured_result)  # type: ignore

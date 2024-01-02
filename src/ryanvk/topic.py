@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import cycle
-from typing import Any, Generic, Iterable, MutableMapping, MutableSequence, Self, TypeVar
+from typing import Any, Generic, MutableMapping, MutableSequence, Self, TypeVar
 
 T = TypeVar("T")
 S = TypeVar("S")
