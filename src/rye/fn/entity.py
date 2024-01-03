@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Generic, cast, overload
 
 try:
@@ -12,6 +13,7 @@ try:
 except ImportError:
     from typing_extensions import Self
 
+from rye.capability_mod import CapabilityPerform
 from rye.collector import BaseCollector
 from rye.entity import BaseEntity
 from rye.fn.record import FnRecord
@@ -21,6 +23,23 @@ from rye.typing import P, R, inRC, specifiedCollectP
 if TYPE_CHECKING:
     from rye.fn.base import Fn
     from rye.fn.overload import FnOverload
+
+
+@dataclass
+class FnImplementCollectCallback:
+    implemented: dict[type[BasePerform], set[Fn]] = field(default_factory=dict)
+
+    def __call__(self, impl_collection: type[BasePerform]):
+        for owner, fns in self.implemented.items():
+            if (
+                issubclass(owner, CapabilityPerform)
+                and not owner.__allow_incomplete__
+                and not fns.issuperset(CapabilityPerform.__collector__.definations)
+            ):
+                raise NotImplementedError(
+                    f"{owner} should implement all of {CapabilityPerform.__collector__.definations}"
+                    f" but only {fns} are implemented"
+                )
 
 
 class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
@@ -72,6 +91,22 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
             triples.add((harvest_info.name, harvest_info.overload, sign))
 
         record["entities"][frozenset(triples)] = twin
+
+        if self.fn.ownership is not None:
+            for i in collector.collected_callbacks:
+                if isinstance(i, FnImplementCollectCallback):
+                    target = i
+                    break
+            else:
+                target = FnImplementCollectCallback()
+                collector.on_collected(target)
+
+            if self.fn.ownership in target.implemented:
+                fns = target.implemented[self.fn.ownership]
+            else:
+                fns = target.implemented[self.fn.ownership] = set()
+
+            fns.add(self.fn)
 
         return self
 
