@@ -9,11 +9,19 @@ from typing import (
     TypeVar,
 )
 
-from typing_extensions import ParamSpec, TypeAlias
+try:
+    from typing import ParamSpec
+except ImportError:
+    from typing_extensions import ParamSpec
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias
 
 if TYPE_CHECKING:
-    from ryanvk.collector import BaseCollector
-    from ryanvk.fn.record import FnOverloadHarvest
+    from rye.collector import BaseCollector
+    from rye.fn.record import FnOverloadHarvest
 
 T = TypeVar("T")
 R = TypeVar("R", covariant=True)

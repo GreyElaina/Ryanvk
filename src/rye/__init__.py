@@ -1,8 +1,9 @@
-from ._runtime import targets_artifact_map as targets_artifact_map
+from ._runtime import ArtifactDest as ArtifactDest
 from .collector import BaseCollector as BaseCollector
 from .fn import Fn as Fn
 from .fn import FnCompose as FnCompose
 from .fn import FnImplement as FnImplement
+from .fn import FnImplementEntity as FnImplementEntity
 from .fn import FnOverload as FnOverload
 from .ops import callee_of as callee_of
 from .ops import instance_of as instance_of

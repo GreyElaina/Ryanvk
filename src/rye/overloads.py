@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import AbstractSet, Any, MutableSet
 
-from ryanvk._ordered_set import OrderedSet
-from ryanvk.typing import Twin
+from rye._ordered_set import OrderedSet
+from rye.typing import Twin
 
 from .fn.overload import FnOverload
 

@@ -3,11 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable, MutableMapping, TypedDict
 
-from ryanvk.topic import PileTopic
-from ryanvk.typing import Twin
+from rye.topic import PileTopic
+from rye.typing import Twin
 
 if TYPE_CHECKING:
-    from ryanvk.fn.overload import FnOverload
+    from rye.fn.overload import FnOverload
 
     from .base import Fn
 

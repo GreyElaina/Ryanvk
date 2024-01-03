@@ -1,14 +1,12 @@
 [project]
-name = "ryanvk"
+name = "rye"
 version = "0.1.0"
 description = ""
 authors = [
     {name = "GreyElaina", email = "GreyElaina@outlook.com"},
 ]
-dependencies = [
-    "typing-extensions>=4.8.0",
-]
-requires-python = ">=3.11"
+dependencies = []
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 

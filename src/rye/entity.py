@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any, NotRequired, TypedDict
 
-from ryanvk.collector import BaseCollector
-from ryanvk.perform import BasePerform
+from rye.collector import BaseCollector
+from rye.perform import BasePerform
 
 
 class EntityAssignInfo(TypedDict):

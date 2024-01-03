@@ -8,7 +8,7 @@ from .typing import inTC
 from .utilles import standalone_context
 
 if TYPE_CHECKING:
-    from ryanvk.fn.record import FnRecord
+    from rye.fn.record import FnRecord
 
     from .fn.base import Fn
 
@@ -58,7 +58,7 @@ def instance_of(cls: type):
 
 
 def callee_of(fn: Fn[Any, inTC]) -> inTC:
-    from ryanvk.fn.compose import EntitiesHarvest
+    from rye.fn.compose import EntitiesHarvest
 
     def wrapper(*args, **kwargs) -> Any:
         signature = fn.compose_instance.signature()
@@ -110,3 +110,5 @@ def iter_artifacts(key: Any | None = None):
             yield content
     finally:
         stack.pop()
+        if not stack:
+            collection.pop(key, None)

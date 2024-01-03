@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Concatenate, Protocol, TypeVar, reveal_type
+from typing import Protocol, TypeVar, reveal_type
 
-from ryanvk.collector import BaseCollector
-from ryanvk.fn.base import Fn
-from ryanvk.fn.compose import FnCompose
-from ryanvk.fn.overload import FnOverload
-from ryanvk.overloads import TypeOverload, SimpleOverload
-from ryanvk.typing import FnComposeCallReturnType, P, R, inTC, P1, R1
-from ryanvk.ops import isolate, layout
-from ryanvk.topic import merge_topics_if_possible
+from rye.collector import BaseCollector
+from rye.fn.base import Fn
+from rye.fn.compose import FnCompose
+from rye.ops import isolate, layout
+from rye.overloads import SimpleOverload, TypeOverload
+from rye.topic import merge_topics_if_possible
+from rye.typing import FnComposeCallReturnType
 
 m = BaseCollector()
 T = TypeVar("T")
@@ -48,7 +47,6 @@ reveal_type(TestPerform.test.implements(type=str))
 reveal_type(TestPerform.test1)
 
 
-
 class TestPerformAlt((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
@@ -69,6 +67,7 @@ class TestPerformAlt1((n := BaseCollector())._):
         print(self.test_impl_int.super(value))
         return "多层测试 - Alt1"
 
+
 class TestPerformAlt2((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
@@ -76,30 +75,34 @@ class TestPerformAlt2((n := BaseCollector())._):
         print(self.test_impl_int.super(value))
         return "多层测试 - Alt2"
 
-    #@n.entity
-    #@TestPerform.test1.implements()
+    # @n.entity
+    # @TestPerform.test1.implements()
     def test1_impl(self, value: type[str]) -> str:
         print("symmetric tes2t", self.test1_impl.super(value))
         return "素月分辉，明河共影，表里俱澄澈。"
-    
+
     reveal_type(TestPerform.test)
     reveal_type(TestPerform.test1)
     reveal_type(TestPerform.test.implements)
     reveal_type(TestPerform.test1.implements())
 
-#a = Staff([TestPerformAlt.__collector__.artifacts], {})
+
+# a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
 
 with isolate():
     from devtools import debug
+
     debug(layout())
 
-    merge_topics_if_possible([
-        TestPerformAlt2.__collector__.artifacts,
-        TestPerformAlt1.__collector__.artifacts,
-        TestPerformAlt.__collector__.artifacts  
-    ], layout())
-
+    merge_topics_if_possible(
+        [
+            TestPerformAlt2.__collector__.artifacts,
+            TestPerformAlt1.__collector__.artifacts,
+            TestPerformAlt.__collector__.artifacts,
+        ],
+        layout(),
+    )
 
     debug(layout())
 

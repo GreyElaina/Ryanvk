@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Concatenate, Protocol, TypeVar, reveal_type
+from typing import Protocol, TypeVar, reveal_type
 
-from ryanvk.collector import BaseCollector
-from ryanvk.fn.base import Fn
-from ryanvk.fn.compose import FnCompose
-from ryanvk.fn.overload import FnOverload
-from ryanvk.overloads import TypeOverload, SimpleOverload
-from ryanvk.typing import FnComposeCallReturnType, P, R
-from ryanvk.ops import isolate, layout
-from ryanvk.topic import merge_topics_if_possible
+from rye.collector import BaseCollector
+from rye.fn.base import Fn
+from rye.fn.compose import FnCompose
+from rye.ops import isolate, layout
+from rye.overloads import SimpleOverload, TypeOverload
+from rye.topic import merge_topics_if_possible
+from rye.typing import FnComposeCallReturnType
 
 m = BaseCollector()
 T = TypeVar("T")
@@ -35,22 +34,22 @@ class TestPerform(m._):
         def collect(self, implement: ShapeCall[T], *, type: type[T]):
             yield self.sim.collect(type)
 
+
 class TestPerformAlt((n := BaseCollector())._):
     @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
-    
+
     reveal_type(TestPerform.test.implements)
+
 
 with isolate():
     from devtools import debug
+
     debug(layout())
 
-    merge_topics_if_possible([
-        TestPerformAlt.__collector__.artifacts  
-    ], layout())
-
+    merge_topics_if_possible([TestPerformAlt.__collector__.artifacts], layout())
 
     debug(layout())
 

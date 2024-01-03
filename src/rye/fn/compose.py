@@ -17,11 +17,11 @@ from typing import (
     overload,
 )
 
-from ryanvk._ordered_set import OrderedSet
-from ryanvk.fn.record import FnImplement
-from ryanvk.ops import instances
-from ryanvk.overloads import SingletonOverload
-from ryanvk.typing import (
+from rye._ordered_set import OrderedSet
+from rye.fn.record import FnImplement
+from rye.ops import instances
+from rye.overloads import SingletonOverload
+from rye.typing import (
     ExplictImplementShape,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
@@ -34,7 +34,7 @@ from ryanvk.typing import (
 )
 
 if TYPE_CHECKING:
-    from ryanvk.fn.base import Fn
+    from rye.fn.base import Fn
 
 
 class FnCompose(ABC):

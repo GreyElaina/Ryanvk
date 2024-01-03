@@ -10,10 +10,13 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Self
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
-from ryanvk.fn.record import FnOverloadHarvest
-from ryanvk.typing import Twin
+from rye.fn.record import FnOverloadHarvest
+from rye.typing import Twin
 
 if TYPE_CHECKING:
     from .compose import FnCompose

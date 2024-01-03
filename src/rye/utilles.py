@@ -4,7 +4,7 @@ import functools
 from contextvars import copy_context
 from typing import Callable, TypeVar
 
-from ryanvk.typing import P, R
+from rye.typing import P, R
 
 T = TypeVar("T")
 

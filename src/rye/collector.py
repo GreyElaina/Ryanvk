@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
 
-from ._runtime import targets_artifact_map
+from ._runtime import ArtifactDest
 from .perform import BasePerform
 
 if TYPE_CHECKING:
@@ -27,7 +27,7 @@ class BaseCollector:
         self._upstream_target = value
 
         if value:
-            self.artifacts = targets_artifact_map.get(None) or {}
+            self.artifacts = ArtifactDest.get(None) or {}
 
     def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
         self.artifacts = artifacts or {}

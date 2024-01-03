@@ -4,9 +4,9 @@ import inspect
 import warnings
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generator, TypeVar
 
-from ryanvk.topic import merge_topics_if_possible
+from rye.topic import merge_topics_if_possible
 
-from ._runtime import targets_artifact_map
+from ._runtime import ArtifactDest
 
 if TYPE_CHECKING:
     from .collector import BaseCollector
@@ -90,7 +90,7 @@ def namespace_generate(
     def wrapper(func: Callable[[], None | Generator[type[BasePerform], None, Any]]):
         namespace: dict[Any, Any] = {}
         manually = set()
-        token = targets_artifact_map.set(namespace)
+        token = ArtifactDest.set(namespace)
 
         before = None
         if warning:
@@ -102,7 +102,7 @@ def namespace_generate(
                     manually.add(i)
                     merge_topics_if_possible([i.__collector__.artifacts], [namespace])  # type: ignore
         finally:
-            targets_artifact_map.reset(token)
+            ArtifactDest.reset(token)
 
         if before is not None:
             for i in list(_gen_subclass(BasePerform))[1:]:

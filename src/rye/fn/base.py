@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, Self, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, TypeVar
 
-from ryanvk.entity import BaseEntity
-from ryanvk.fn.compose import FnCompose
-from ryanvk.fn.entity import FnImplementEntity
-from ryanvk.ops import callee_of
-from ryanvk.typing import (
+from rye.entity import BaseEntity
+from rye.fn.compose import FnCompose
+from rye.fn.entity import FnImplementEntity
+from rye.ops import callee_of
+from rye.typing import (
     P1,
     R1,
     FnComposeCallReturnType,
@@ -25,6 +25,7 @@ K = TypeVar("K")
 
 callShape = TypeVar("callShape", bound=Callable, covariant=True)
 collectShape = TypeVar("collectShape", bound=Callable, covariant=True)
+
 
 class FnMethodComposeCls(Protocol[collectShape, callShape]):
     @property
