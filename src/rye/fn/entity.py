@@ -13,7 +13,7 @@ try:
 except ImportError:
     from typing_extensions import Self
 
-from rye.capability_mod import CapabilityPerform
+from rye._capability import CapabilityPerform
 from rye.collector import BaseCollector
 from rye.entity import BaseEntity
 from rye.fn.record import FnRecord
@@ -87,7 +87,7 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
             sign = harvest_info.overload.digest(harvest_info.value)
             scope = overload_scopes.setdefault(harvest_info.name, {})
             target_set = harvest_info.overload.collect(scope, sign)
-            target_set.add(twin)
+            target_set[twin] = None
             triples.add((harvest_info.name, harvest_info.overload, sign))
 
         record["entities"][frozenset(triples)] = twin

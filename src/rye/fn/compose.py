@@ -5,19 +5,17 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import (
     TYPE_CHECKING,
-    AbstractSet,
     Any,
     Callable,
-    ClassVar,
     Concatenate,
     ContextManager,
+    Final,
     Generic,
     Iterable,
     Self,
     overload,
 )
 
-from rye._ordered_set import OrderedSet
 from rye.fn.record import FnImplement
 from rye.ops import instances
 from rye.overloads import SingletonOverload
@@ -80,31 +78,34 @@ class FnCompose(ABC):
 
 
 class EntitiesHarvest(Generic[unspecifiedCollectP]):
-    mutation_endpoint: ClassVar[ContextVar[Self]] =\
+    mutation_endpoint: Final[ContextVar[Self]] = \
         ContextVar("EntitiesHarvest.mutation_endpoint")  # fmt: off
 
     finished: bool = False
-    _incompleted_result: OrderedSet[Twin] | None = None
+    _incompleted_result: dict[Twin, None] | None = None
 
-    def commit(self, inbound: AbstractSet[Twin]) -> None:
+    def commit(self, inbound: dict[Twin, None]) -> None:
         if self._incompleted_result is None:
-            self._incompleted_result = OrderedSet(inbound)
+            self._incompleted_result = inbound
             return
 
-        self._incompleted_result.intersection_update(inbound)
+        self._incompleted_result = {k: inbound[k] if k in inbound else v for k, v in self._incompleted_result.items()}
 
     @property
     def ensured_result(self):
         if not self.finished or self._incompleted_result is None:
             raise LookupError("attempts to read result before its mutations all finished")
 
-        return self._incompleted_result
+        return list(self._incompleted_result.keys())
 
     def ensure_twin(self, twin: Twin) -> Callable:
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
         instances_context = instances(context=True)
+
+        # TODO: 这里实例化迟早给他改掉，然后换 Lifespan.
+        # 怎么感觉像是早期 BCC -> 现代 BCC 的感觉。
 
         if collector.cls not in instances_context:
             instance = instances_context[collector.cls] = collector.cls()
@@ -118,7 +119,12 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
 
     @property
     def first(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Callable[P, R]:
-        return self.ensure_twin(self.ensured_result[0])  # type: ignore
+        result = self.ensured_result
+        
+        if not result:
+            raise NotImplementedError("cannot lookup any implementation with given arguments")
+
+        return self.ensure_twin(result[0])  # type: ignore
 
     def iter_result(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Iterable[Callable[P, R]]:
         return map(self.ensure_twin, self.ensured_result)  # type: ignore

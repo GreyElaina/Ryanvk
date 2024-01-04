@@ -28,6 +28,8 @@ class BasePerform:
     # and could be used in a widen context safely.
 
     __no_warn__: ClassVar[bool] = False
+    # when a perform is labeled "no_warn",
+    # `namespace_generate` won't complain anything related to the perform.
 
     def __post_init__(self):
         ...
@@ -85,6 +87,8 @@ def namespace_generate(
         在现有的约定中，属于协议实现的 Perform 不应该声明局部生命周期资源，这会带来非必要的负担，
         请使用 launart 提供的 Service、Broadcast Control 提供的生命周期钩子或是其他能提供等效形式的方法实现
         （通常可以达到同等或超出的效果），再使用 mountpoint handler 暴露给 Ryanvk World 访问。
+            > 该特性暂时被禁用。
+            > NOTE: Ryanvk 1.3 有意加入对 launart / bcc 等 host 的上下文自动托管 / 同步特性
     """
 
     def wrapper(func: Callable[[], None | Generator[type[BasePerform], None, Any]]):
@@ -101,6 +105,8 @@ def namespace_generate(
                 for i in func():
                     manually.add(i)
                     merge_topics_if_possible([i.__collector__.artifacts], [namespace])  # type: ignore
+            else:
+                func()
         finally:
             ArtifactDest.reset(token)
 
@@ -111,8 +117,8 @@ def namespace_generate(
 
                 if (
                     warn_for_accident_declare
-                    and not i.__collector__.upstream_target
                     and not i.__no_warn__
+                    and not i.__collector__.upstream_target
                     and i not in manually
                 ):
                     warnings.warn(

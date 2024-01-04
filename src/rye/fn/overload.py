@@ -2,18 +2,16 @@ from __future__ import annotations
 
 from typing import (
     TYPE_CHECKING,
-    AbstractSet,
     Any,
     Generic,
-    MutableSet,
     TypeVar,
     overload,
 )
 
 try:
-    from typing import Self
+    from typing import Self, final
 except ImportError:
-    from typing_extensions import Self
+    from typing_extensions import Self, final
 
 from rye.fn.record import FnOverloadHarvest
 from rye.typing import Twin
@@ -31,16 +29,17 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
     def __init__(self) -> None:
         ...
 
+    @final
     def as_agent(self):
         return FnOverloadAgentDescriptor(self)
 
     def digest(self, collect_value: TCollectValue) -> TSignature:
         ...
 
-    def collect(self, scope: dict, signature: TSignature) -> MutableSet[Twin]:
+    def collect(self, scope: dict, signature: TSignature) -> dict[Twin, None]:
         ...
 
-    def harvest(self, scope: dict, value: TCallValue) -> AbstractSet[Twin]:
+    def harvest(self, scope: dict, value: TCallValue) -> dict[Twin, None]:
         ...
 
 

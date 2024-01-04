@@ -3,10 +3,9 @@ from __future__ import annotations
 from contextvars import ContextVar
 from typing import Any, MutableMapping, MutableSequence
 
-ArtifactDest: ContextVar[MutableMapping[Any, Any]]\
-    = ContextVar("ArtifactDest")  # fmt: off
-
 GlobalArtifacts: MutableMapping[Any, Any] = {}
+
+ArtifactDest: ContextVar[MutableMapping[Any, Any]] = ContextVar("ArtifactDest")
 # FIXME: immutable by default, mutable partially.
 
 Layout: ContextVar[MutableSequence[MutableMapping[Any, Any]]] = ContextVar("Layout")

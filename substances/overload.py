@@ -71,7 +71,7 @@ reveal_type(TestPerform.test.implements(type=list[str]).__call__)
 
 
 class TestPerformAlt((n := BaseCollector())._):
-    # @n.entity
+    @n.entity
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"

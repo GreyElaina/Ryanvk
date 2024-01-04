@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Generator, MutableMapping
+from typing import TYPE_CHECKING, Any, Generator, Generic, MutableMapping
 
 from rye.fn.record import FnImplement
 
@@ -10,9 +10,8 @@ from .typing import R1, Q, R, inTC
 from .utilles import standalone_context
 
 if TYPE_CHECKING:
-    from rye.fn.record import FnRecord
-
-    from .fn.base import Fn
+    from .fn import Fn
+    from .fn.record import FnRecord
 
 
 def layout():
@@ -84,7 +83,7 @@ def iter_artifacts(key: Any | None = None):
             collection.pop(key, None)
 
 
-class _WrapGenerator(Generator[R, Q, R1]):
+class _WrapGenerator(Generic[R, Q, R1]):
     value: R1
 
     def __init__(self, gen: Generator[R, Q, R1]):
@@ -96,7 +95,8 @@ class _WrapGenerator(Generator[R, Q, R1]):
 
 
 def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
-    from rye.fn.compose import EntitiesHarvest
+    from .fn import Fn
+    from .fn.compose import EntitiesHarvest
 
     def wrapper(*args, **kwargs) -> Any:
         if isinstance(target, Fn):

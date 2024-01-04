@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from .perform import BaseCollector, BasePerform
+from .collector import BaseCollector
+from .perform import BasePerform
 
 if TYPE_CHECKING:
     from .fn import Fn
@@ -62,6 +63,7 @@ def capability():
 
 # NOTE: 只能 Fn 而不是 Overload 层次的检查。
 
+
 def is_implemented(perform: type[BasePerform] | BasePerform, capability: type[CapabilityPerform]) -> bool:
     if not isinstance(perform, type):
         perform = perform.__class__
@@ -69,5 +71,5 @@ def is_implemented(perform: type[BasePerform] | BasePerform, capability: type[Ca
     for define in capability.__collector__.definations:
         if define.compose_instance.signature() in perform.__collector__.artifacts:
             return True
-    
+
     return False

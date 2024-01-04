@@ -18,3 +18,4 @@ def standalone_context(func: Callable[P, R]) -> Callable[P, R]:
         return cx.run(func, *args, **kwargs)
 
     return wrapper
+ 

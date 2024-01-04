@@ -1,6 +1,6 @@
+from ._capability import capability as capability
+from ._capability import is_implemented as is_implemented
 from ._runtime import ArtifactDest as ArtifactDest
-from .capability_mod import capability as capability
-from .capability_mod import is_implemented as is_implemented
 from .collector import BaseCollector as BaseCollector
 from .fn import Fn as Fn
 from .fn import FnCompose as FnCompose
