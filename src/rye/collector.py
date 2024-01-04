@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
 
+from typing_extensions import Self
+
 from ._runtime import ArtifactDest
 from .perform import BasePerform
 
@@ -55,7 +57,7 @@ class BaseCollector:
 
     def collect(
         self,
-        signature: SupportsCollect[P, R],
+        signature: SupportsCollect[Self, P, R],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> R:
