@@ -164,7 +164,7 @@ def is_implemented(
         if not pred:
             return False
     
-        if not (args and kwargs):
+        if not (args or kwargs):
             return True
 
         record: FnRecord = perform.__collector__.artifacts[fn_sign]
