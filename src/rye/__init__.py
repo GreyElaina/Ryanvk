@@ -1,5 +1,4 @@
 from ._capability import capability as capability
-from ._capability import is_implemented as is_implemented
 from ._runtime import ArtifactDest as ArtifactDest
 from .collector import BaseCollector as BaseCollector
 from .fn import Fn as Fn
@@ -10,6 +9,7 @@ from .fn import FnOverload as FnOverload
 from .ops import callee_of as callee_of
 from .ops import instance_of as instance_of
 from .ops import instances as instances
+from .ops import is_implemented as is_implemented
 from .ops import isolate as isolate
 from .ops import iter_artifacts as iter_artifacts
 from .ops import layout as layout
