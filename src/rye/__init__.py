@@ -29,3 +29,4 @@ from .perform import namespace_generate as namespace_generate
 from .topic import PileTopic as PileTopic
 from .topic import Topic as Topic
 from .topic import merge_topics_if_possible as merge_topics_if_possible
+from .utilities import standalone_context as standalone_context
