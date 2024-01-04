@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Generator, Generic, MutableMapping
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, MutableMapping, overload
 
 from rye.fn.record import FnImplement
 
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
-from .typing import R1, Q, R, inTC
+from .typing import R1, P, Q, R, inTC
 from .utilities import standalone_context
 
 if TYPE_CHECKING:
+    from ._capability import CapabilityPerform
     from .fn import Fn
     from .fn.record import FnRecord
+    from .perform import BasePerform
 
 
 def layout():
@@ -123,3 +125,64 @@ def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
             raise NotImplementedError
 
     return wrapper  # type: ignore
+
+
+@overload
+def is_implemented(perform: type[BasePerform] | BasePerform, target: type[CapabilityPerform]) -> bool:
+    ...
+
+
+@overload
+def is_implemented(perform: type[BasePerform] | BasePerform, target: Fn) -> bool:
+    ...
+
+
+@overload
+def is_implemented(
+    perform: type[BasePerform] | BasePerform,
+    target: Fn[Callable[Concatenate[Any, P], Any], Any],
+    *args: P.args,
+    **kwargs: P.kwargs,
+) -> bool:
+    ...
+
+
+def is_implemented(
+    perform: type[BasePerform] | BasePerform, target: type[CapabilityPerform] | Fn, *args, **kwargs
+) -> bool:
+    if not isinstance(perform, type):
+        perform = perform.__class__
+
+    if isinstance(target, type):
+        for define in target.__collector__.definations:
+            if define.compose_instance.signature() in perform.__collector__.artifacts:
+                return True
+    else:
+        fn_sign = target.compose_instance.signature()
+        pred = fn_sign in perform.__collector__.artifacts
+
+        if not pred:
+            return False
+    
+        if not (args or kwargs):
+            return True
+
+        record: FnRecord = perform.__collector__.artifacts[fn_sign]
+        overload_scopes = record['overload_scopes']
+
+        slots = []
+
+        for harvest_info in target.compose_instance.collect(Any, *args, **kwargs):
+            sign = harvest_info.overload.digest(harvest_info.value)
+            if harvest_info.name not in overload_scopes:
+                return False
+            scope = overload_scopes[harvest_info.name]
+            twin_slot = harvest_info.overload.access(scope, sign)
+            if twin_slot is None:
+                return False
+            slots.append(twin_slot)
+        
+        if slots and set(slots.pop()).intersection(*slots):
+            return True
+
+    return False

@@ -5,7 +5,7 @@ from typing import Protocol, TypeVar, reveal_type
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
-from rye.ops import isolate, layout
+from rye.ops import is_implemented, isolate, layout
 from rye.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
@@ -107,6 +107,9 @@ with isolate():
     debug(layout())
 
     b = TestPerform.test.callee(str)
+    print("111", is_implemented(TestPerformAlt, TestPerform.test))
+    print("222", is_implemented(TestPerformAlt, TestPerform.test, type=str))
+    print("222", is_implemented(TestPerformAlt, TestPerform.test, type=int))
     c = TestPerform.test1.callee(str)
 
     print("??", repr(b), repr(c))

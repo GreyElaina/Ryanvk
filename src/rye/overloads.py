@@ -31,6 +31,10 @@ class SimpleOverload(FnOverload[SimpleOverloadSignature, type[Any], Any]):
 
         return {}
 
+    def access(self, scope: dict, signature: SimpleOverloadSignature) -> dict[Twin, None] | None:
+        if signature.value in scope:
+            return scope[signature.value]
+
 
 @dataclass(eq=True, frozen=True)
 class TypeOverloadSignature:
@@ -56,6 +60,10 @@ class TypeOverload(FnOverload[TypeOverloadSignature, type[Any], Any]):
 
         return {}
 
+    def access(self, scope: dict, signature: TypeOverloadSignature) -> dict[Twin, None] | None:
+        if signature.type in scope:
+            return scope[signature.type]
+
 
 class _SingletonOverloadSignature:
     ...
@@ -74,3 +82,7 @@ class SingletonOverload(FnOverload[None, None, None]):
 
     def harvest(self, scope: dict, value: None) -> dict[Twin, None]:
         return scope[None]
+
+    def access(self, scope: dict, signature: None) -> dict[Twin, None] | None:
+        if None in scope:
+            return scope[None]
