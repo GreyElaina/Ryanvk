@@ -58,3 +58,16 @@ class CapabilityCollector(BaseCollector):
 
 def capability():
     return CapabilityCollector()
+
+
+# NOTE: 只能 Fn 而不是 Overload 层次的检查。
+
+def is_implemented(perform: type[BasePerform] | BasePerform, capability: type[CapabilityPerform]) -> bool:
+    if not isinstance(perform, type):
+        perform = perform.__class__
+
+    for define in capability.__collector__.definations:
+        if define.compose_instance.signature() in perform.__collector__.artifacts:
+            return True
+    
+    return False
