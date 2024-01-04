@@ -15,7 +15,7 @@ T = TypeVar("T")
 
 
 class TestPerform(m._):
-    @m.entity
+    @m.collect
     @Fn.compose
     class test(FnCompose):
         type = TypeOverload().as_agent()
@@ -36,7 +36,7 @@ class TestPerform(m._):
 
 
 class TestPerformAlt((n := BaseCollector())._):
-    @n.entity
+    @n.collect
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"

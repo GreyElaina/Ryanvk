@@ -15,7 +15,7 @@ T = TypeVar("T")
 
 
 class TestPerform(m._):
-    @m.entity
+    @m.collect
     @Fn.compose
     class test(FnCompose):
         type = TypeOverload().as_agent()
@@ -34,7 +34,7 @@ class TestPerform(m._):
         def collect(self, implement: ShapeCall[T], *, type: type[T]):
             yield self.sim.collect(type)
 
-    @m.entity
+    @m.collect
     @Fn.symmetric
     @staticmethod
     def test1(value: type[T]) -> T:
@@ -48,12 +48,12 @@ reveal_type(TestPerform.test1)
 
 
 class TestPerformAlt((n := BaseCollector())._):
-    @n.entity
+    @n.collect
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
 
-    @n.entity
+    @n.collect
     @TestPerform.test1.implements()  # type: ignore
     def test1_impl(self, value: type[str]) -> str:
         print("symmetric test")
@@ -61,7 +61,7 @@ class TestPerformAlt((n := BaseCollector())._):
 
 
 class TestPerformAlt1((n := BaseCollector())._):
-    @n.entity
+    @n.collect
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         print(self.test_impl_int.super(value))
@@ -69,7 +69,7 @@ class TestPerformAlt1((n := BaseCollector())._):
 
 
 class TestPerformAlt2((n := BaseCollector())._):
-    @n.entity
+    @n.collect
     @TestPerform.test.implements(type=str)
     def test_impl_int(self, value: type[str]) -> str:
         print(self.test_impl_int.super(value))

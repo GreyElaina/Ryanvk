@@ -53,7 +53,7 @@ class BaseCollector:
         self.on_collected(lambda _: context_manager.__exit__(None, None, None))
         return context_manager.__enter__()
 
-    def entity(
+    def collect(
         self,
         signature: SupportsCollect[P, R],
         *args: P.args,
