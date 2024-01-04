@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, MutableMapping
 
+from rye.fn.record import FnImplement
+
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from .typing import inTC
 from .utilles import standalone_context
@@ -57,11 +59,15 @@ def instance_of(cls: type):
     return instances()[cls]
 
 
-def callee_of(fn: Fn[Any, inTC]) -> inTC:
+def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
     from rye.fn.compose import EntitiesHarvest
 
     def wrapper(*args, **kwargs) -> Any:
-        signature = fn.compose_instance.signature()
+        if isinstance(target, Fn):
+            signature = target.compose_instance.signature()
+        else:
+            signature = target
+
         for artifacts in iter_artifacts(signature):
             if signature in artifacts:
                 record: FnRecord = artifacts[signature]
