@@ -120,7 +120,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
     @property
     def first(self: EntitiesHarvest[Concatenate[Callable[P, R], ...]]) -> Callable[P, R]:
         result = self.ensured_result
-        
+
         if not result:
             raise NotImplementedError("cannot lookup any implementation with given arguments")
 
