@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, MutableMapping
+from typing import TYPE_CHECKING, Any, Generator, MutableMapping
 
 from rye.fn.record import FnImplement
 
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
-from .typing import inTC
+from .typing import R1, Q, R, inTC
 from .utilles import standalone_context
 
 if TYPE_CHECKING:
@@ -59,42 +59,6 @@ def instance_of(cls: type):
     return instances()[cls]
 
 
-def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
-    from rye.fn.compose import EntitiesHarvest
-
-    def wrapper(*args, **kwargs) -> Any:
-        if isinstance(target, Fn):
-            signature = target.compose_instance.signature()
-        else:
-            signature = target
-
-        for artifacts in iter_artifacts(signature):
-            if signature in artifacts:
-                record: FnRecord = artifacts[signature]
-                define = record["define"]
-
-                # token = upstream_staff.set(staff)
-                try:
-                    iters = define.compose_instance.call(*args, **kwargs)
-                    harvest_info = next(iters)
-                    harv = EntitiesHarvest.mutation_endpoint.get()
-                    while True:
-                        scope = record["overload_scopes"][harvest_info.name]
-                        stage = harvest_info.overload.harvest(scope, harvest_info.value)
-                        harv.commit(stage)
-                        harvest_info = next(iters)
-
-                except StopIteration as e:
-                    return e.value
-                finally:
-                    # upstream_staff.reset(token)
-                    ...
-        else:
-            raise NotImplementedError
-
-    return wrapper  # type: ignore
-
-
 @standalone_context
 def iter_artifacts(key: Any | None = None):
     collection = AccessStack.get(None)
@@ -118,3 +82,44 @@ def iter_artifacts(key: Any | None = None):
         stack.pop()
         if not stack:
             collection.pop(key, None)
+
+
+class _WrapGenerator(Generator[R, Q, R1]):
+    value: R1
+
+    def __init__(self, gen: Generator[R, Q, R1]):
+        self.gen = gen
+
+    def __iter__(self) -> Generator[R, Q, R1]:
+        self.value = yield from self.gen
+        return self.value
+
+
+def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
+    from rye.fn.compose import EntitiesHarvest
+
+    def wrapper(*args, **kwargs) -> Any:
+        if isinstance(target, Fn):
+            signature = target.compose_instance.signature()
+        else:
+            signature = target
+
+        for artifacts in iter_artifacts(signature):
+            if signature in artifacts:
+                record: FnRecord = artifacts[signature]
+                define = record["define"]
+
+                wrap = _WrapGenerator(define.compose_instance.call(*args, **kwargs))
+
+                for harvest_info in wrap:
+                    scope = record["overload_scopes"][harvest_info.name]
+                    stage = harvest_info.overload.harvest(scope, harvest_info.value)
+                    endpoint = EntitiesHarvest.mutation_endpoint.get(None)
+                    if endpoint is not None:
+                        endpoint.commit(stage)
+
+                return wrap.value
+        else:
+            raise NotImplementedError
+
+    return wrapper  # type: ignore
