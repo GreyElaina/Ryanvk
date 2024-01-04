@@ -41,6 +41,9 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
 
     def harvest(self, scope: dict, value: TCallValue) -> dict[Twin, None]:
         ...
+    
+    def access(self, scope: dict, signature: TSignature) -> dict[Twin, None] | None:
+        ...
 
 
 class FnOverloadAgent(Generic[On]):
