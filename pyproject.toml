@@ -5,7 +5,10 @@ description = ""
 authors = [
     {name = "GreyElaina", email = "GreyElaina@outlook.com"},
 ]
-dependencies = []
+dependencies = [
+    # typing-extensions for python <= 3.11, for NotRequired
+    "typing-extensions; python_version < '3.11'",
+]
 requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}

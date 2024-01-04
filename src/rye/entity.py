@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, NotRequired, TypedDict
+from typing import Any, final
+
+try:
+    from typing import NotRequired, TypedDict
+except ImportError:
+    from typing_extensions import NotRequired, TypedDict
 
 from rye.collector import BaseCollector
 from rye.perform import BasePerform
@@ -24,6 +29,7 @@ class BaseEntity:
     def assign_callback(self, info: EntityAssignInfo):
         ...
 
+    @final
     def _fallback_collected_callback(self, cls: type):
         self.assign_callback({})
 
