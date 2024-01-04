@@ -7,7 +7,7 @@ from rye.fn.record import FnImplement
 
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from .typing import R1, Q, R, inTC
-from .utilles import standalone_context
+from .utilities import standalone_context
 
 if TYPE_CHECKING:
     from .fn import Fn
