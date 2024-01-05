@@ -22,5 +22,8 @@ dev = [
     "ruff>=0.1.3",
     "ipykernel>=6.27.1",
     "devtools>=0.12.2",
-    "pylyzer>=0.0.51",
+    "pytest>=7.4.4",
+    "pytest-mocha>=0.4.0",
+    "pytest-rich>=0.1.1",
+    "attrs>=23.2.0",
 ]

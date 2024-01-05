@@ -1,0 +1,81 @@
+# Test Layout
+
+- Collector
+  - on_collected
+  - remove_collected_callback
+  - using
+  - class ring (ring-[1, 2, 3])
+- Entity
+  - assign_callback
+    - attr assign
+      - annotation
+      - no-annotation
+    - no-attr
+    - collector accessible (unavailable before @m.entity)
+- Perform
+  - collector available
+  - `__post_init__`
+  - apply_to
+  - `__post_collected__` - ring-3
+  - namespace generate
+- utilities
+  - standalone_context
+- Fn
+  - 0-overloads
+    - SingletonOverload
+    - Fn.symmetric
+  - 1-overloads
+    - SimpleOverload
+    - TypeOverload
+  - complex-conditions for FnCompose.call
+  - Overload (builtins & custom)
+    - digest
+    - collect
+    - access
+    - harvest
+  - Entity
+    - collect
+      - non-existed record
+      - existed record
+    - access via `(self)`
+      - implement self
+      - super
+  - overloaded fn
+    - collect overloaded
+    - call overloaded
+  - entities harvest
+    - single call
+    - multiple call
+    - independent test
+    - result.first
+    - result.iter_result
+- ops
+  - layout
+    - only-global
+    - local
+      - mutable
+      - immutable
+    - protected sections
+      - default-cases
+  - shallow
+    - only-global is global
+    - local is local
+  - isolate
+    - immutable declare
+  - instances
+    - no-context
+    - context
+    - nullaware
+  - provide
+    - no-context instances
+    - access = instance_of
+  - iter_artifacts
+    - key-dependent
+  - callee_of
+  - is_implemented (fn / fn implement)
+- capability
+  - allow incomplete
+- topic
+  - normal
+  - pile topic
+- host (wip)
