@@ -102,7 +102,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
         # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
-        instances_context = instances(context=True)
+        instances_context = instances()
 
         # TODO: 这里实例化迟早给他改掉，然后换 Lifespan.
         # 怎么感觉像是早期 BCC -> 现代 BCC 的感觉。
