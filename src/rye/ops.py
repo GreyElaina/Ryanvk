@@ -33,18 +33,24 @@ def isolate(*collections: MutableMapping[Any, Any]):
         Layout.reset(token)
 
 @overload
-def instances(*, context: Literal[False] = False) -> MutableMapping[type, Any]:
+def instances(*, context: Literal[False] = False, nullaware: Literal[True] = True) -> MutableMapping[type, Any]:
     ...
 
 @overload
-def instances(*, context: Literal[True]) -> ContextManager[MutableMapping[type, Any]]: ...
+def instances(*, context: Literal[False] = False, nullaware: Literal[False]) -> MutableMapping[type, Any] | None:
+    ...
+
+@overload
+def instances(*, context: Literal[True], nullaware: bool = True) -> ContextManager[MutableMapping[type, Any]]: ...
 
 
-def instances(*, context: bool = False) -> MutableMapping[type, Any] | ContextManager[MutableMapping[type, Any]]:
+def instances(*, context: bool = False, nullaware: bool = True) -> MutableMapping[type, Any] | ContextManager[MutableMapping[type, Any]] | None:
     context_value = Instances.get(None)
 
     if not context:
-        return context_value or {}
+        if nullaware:
+            return context_value or {}
+        return context_value
 
     @contextmanager
     def wrapper():
@@ -66,7 +72,10 @@ def instances(*, context: bool = False) -> MutableMapping[type, Any] | ContextMa
 
 @contextmanager
 def provide(*instances_: Any):
-    context_value = instances(context=True)
+    context_value = instances(nullaware=False)
+    if context_value is None:
+        raise RuntimeError("provide() can only be used when instances available")
+
     old_values = {type_: context_value[type_] for instance in instances_ if (type_ := type(instance)) in context_value}
 
     context_value.update({type(instance): instance for instance in instances_})
