@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, MutableMapping, overload
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Generator, Generic, Literal, MutableMapping, overload
 
 from rye.fn.record import FnImplement
 
@@ -32,18 +32,36 @@ def isolate(*collections: MutableMapping[Any, Any]):
     finally:
         Layout.reset(token)
 
+@overload
+def instances(*, context: Literal[False] = False) -> MutableMapping[type, Any]:
+    ...
 
-def instances(*, context: bool = False) -> MutableMapping[type, Any]:
+@overload
+def instances(*, context: Literal[True]) -> ContextManager[MutableMapping[type, Any]]: ...
+
+
+def instances(*, context: bool = False) -> MutableMapping[type, Any] | ContextManager[MutableMapping[type, Any]]:
     context_value = Instances.get(None)
 
     if not context:
         return context_value or {}
 
-    if context_value is None:
-        context_value = {}
-        Instances.set(context_value)
+    @contextmanager
+    def wrapper():
+        nonlocal context_value
 
-    return context_value
+        if context_value is None:
+            context_value = {}
+            token = Instances.set(context_value)
+        
+            try:
+                yield context_value
+            finally:
+                Instances.reset(token)
+        else:
+            yield context_value
+
+    return wrapper()
 
 
 @contextmanager
