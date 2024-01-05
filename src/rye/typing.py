@@ -30,7 +30,7 @@ P = ParamSpec("P")
 P1 = ParamSpec("P1")
 Q = TypeVar("Q", contravariant=True)
 
-K = TypeVar("K", contravariant=True, bound=BaseCollector)
+K = TypeVar("K", contravariant=True, bound="BaseCollector")
 
 unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
 specifiedCollectP = ParamSpec("specifiedCollectP")
