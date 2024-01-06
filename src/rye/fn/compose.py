@@ -58,7 +58,7 @@ class FnCompose(ABC):
         return FnImplement(self.fn)
 
     @overload
-    def harvest(self: ExplictImplementShape[inTC]) -> ContextManager[EntitiesHarvest[inTC]]:
+    def harvest(self: ExplictImplementShape[inTC]) -> ContextManager[EntitiesHarvest[[inTC]]]:
         ...
 
     @overload
