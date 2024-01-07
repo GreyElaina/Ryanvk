@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, TypeVar, reveal_type
 
+from rye._runtime import GlobalArtifacts
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
@@ -105,6 +106,7 @@ with isolate():
     )
 
     debug(layout())
+    debug(GlobalArtifacts)
 
     b = TestPerform.test.callee(str)
     print("111", is_implemented(TestPerformAlt, TestPerform.test))

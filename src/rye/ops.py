@@ -1,9 +1,22 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Generator, Generic, Literal, MutableMapping, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Concatenate,
+    ContextManager,
+    Generator,
+    Generic,
+    Literal,
+    MutableMapping,
+    MutableSequence,
+    overload,
+)
 
 from rye.fn.record import FnImplement
+from rye.layout import DetailedArtifacts
 
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from .typing import R1, P, Q, R, inTC
@@ -16,7 +29,7 @@ if TYPE_CHECKING:
     from .perform import BasePerform
 
 
-def layout():
+def layout() -> MutableSequence[DetailedArtifacts[Any, Any]]:
     return Layout.get(None) or [GlobalArtifacts]
 
 
@@ -25,26 +38,40 @@ def shallow():
 
 
 @contextmanager
-def isolate(*collections: MutableMapping[Any, Any]):
-    token = Layout.set([*collections, GlobalArtifacts])
+def isolate(*collections: MutableMapping[Any, Any] | DetailedArtifacts, default_protected: bool = True):
+    colls = [*collections]
+
+    for index, value in enumerate(colls):
+        if not isinstance(value, DetailedArtifacts):
+            v = DetailedArtifacts(value)
+            v.protected = default_protected
+            colls[index] = v
+
+    token = Layout.set([*colls, GlobalArtifacts])  # type: ignore
     try:
         yield
     finally:
         Layout.reset(token)
 
+
 @overload
 def instances(*, context: Literal[False] = False, nullaware: Literal[True] = True) -> MutableMapping[type, Any]:
     ...
+
 
 @overload
 def instances(*, context: Literal[False] = False, nullaware: Literal[False]) -> MutableMapping[type, Any] | None:
     ...
 
+
 @overload
-def instances(*, context: Literal[True], nullaware: bool = True) -> ContextManager[MutableMapping[type, Any]]: ...
+def instances(*, context: Literal[True], nullaware: bool = True) -> ContextManager[MutableMapping[type, Any]]:
+    ...
 
 
-def instances(*, context: bool = False, nullaware: bool = True) -> MutableMapping[type, Any] | ContextManager[MutableMapping[type, Any]] | None:
+def instances(
+    *, context: bool = False, nullaware: bool = True
+) -> MutableMapping[type, Any] | ContextManager[MutableMapping[type, Any]] | None:
     context_value = Instances.get(None)
 
     if not context:
@@ -59,7 +86,7 @@ def instances(*, context: bool = False, nullaware: bool = True) -> MutableMappin
         if context_value is None:
             context_value = {}
             token = Instances.set(context_value)
-        
+
             try:
                 yield context_value
             finally:
@@ -190,12 +217,12 @@ def is_implemented(
 
         if not pred:
             return False
-    
+
         if not (args or kwargs):
             return True
 
         record: FnRecord = perform.__collector__.artifacts[fn_sign]
-        overload_scopes = record['overload_scopes']
+        overload_scopes = record["overload_scopes"]
 
         slots = []
 
@@ -208,7 +235,7 @@ def is_implemented(
             if twin_slot is None:
                 return False
             slots.append(twin_slot)
-        
+
         if slots and set(slots.pop()).intersection(*slots):
             return True
 
