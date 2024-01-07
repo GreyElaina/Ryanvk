@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Iterable, MutableMapping, TypedDict
+from typing import TYPE_CHECKING, Any, MutableMapping, TypedDict
 
 from rye.topic import PileTopic
 from rye.typing import Twin
@@ -24,9 +24,6 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
 
     def iter_entities(self, record: FnRecord) -> MutableMapping[frozenset[tuple[str, "FnOverload", Any]], Twin]:
         return record["entities"]
-
-    def insist_objects(self, record: FnRecord) -> Iterable[Any]:
-        return [*record["entities"].keys(), *record["entities"].values()]
 
     def has_entity(
         self,

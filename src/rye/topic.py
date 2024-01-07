@@ -3,6 +3,8 @@ from __future__ import annotations
 from itertools import cycle
 from typing import Any, Generic, MutableMapping, MutableSequence, Self, TypeVar
 
+from .layout import DetailedArtifacts
+
 T = TypeVar("T")
 S = TypeVar("S")
 E = TypeVar("E")
@@ -33,8 +35,13 @@ class PileTopic(Generic[T, S, E], Topic[T]):
     def flatten_entity(self, record: T, signature: S, entity: E, replacement: E | None) -> None:
         ...
 
-    def merge(self, inbound: list[T], outbound: list[MutableMapping[Self, T]]) -> None:
-        outbound_depth = len(outbound)
+    def merge(self, inbound: list[T], outbound: list[DetailedArtifacts[Self, T]]) -> None:
+        for index, value in enumerate(outbound):
+            if value.protected:
+                outbound_depth = index
+                break
+        else:
+            outbound_depth = len(outbound)
 
         grouped: dict[S, list[tuple[T, E] | None]] = {}
         record_update_tasks = []
@@ -61,13 +68,16 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                 record, entity = twin
 
                 if outbound_index == outbound_depth:
+                    v = DetailedArtifacts({self: self.new_record()})
+                    outbound.insert(outbound_index, v)
                     outbound_depth += 1
-                    outbound.append({self: self.new_record()})
+                else:
+                    v = outbound[outbound_index]
 
-                if self not in outbound[outbound_index]:
-                    outbound[outbound_index][self] = self.new_record()
+                if self not in v:
+                    v[self] = self.new_record()
 
-                target_record = outbound[outbound_index][self]
+                target_record = v[self]
 
                 if self.has_entity(target_record, identity):
                     e = self.get_entity(target_record, identity)
@@ -90,8 +100,8 @@ class PileTopic(Generic[T, S, E], Topic[T]):
 
 
 def merge_topics_if_possible(
-    inbounds: MutableSequence[MutableMapping[Any, Any]],
-    outbound: MutableSequence[MutableMapping[Any, Any]],
+    inbounds: MutableSequence[MutableMapping[Any, Any] | DetailedArtifacts[Any, Any]],
+    outbound: MutableSequence[DetailedArtifacts[Any, Any]],
     *,
     replace_non_topic: bool = True,
 ) -> None:
@@ -113,7 +123,4 @@ def merge_topics_if_possible(
                 done_replace.add(maybe_topic)
 
     for topic, records in topic_pair_records.items():
-        if topic not in outbound[0]:
-            outbound[0][topic] = topic.new_record()
-
         topic.merge(records, outbound)
