@@ -90,6 +90,7 @@ def namespace_generate(
             > 该特性暂时被禁用。
             > NOTE: Ryanvk 1.3 有意加入对 launart / bcc 等 host 的上下文自动托管 / 同步特性
     """
+    from .collector import UpstreamCollector
 
     def wrapper(func: Callable[[], None | Generator[type[BasePerform], None, Any]]):
         namespace: dict[Any, Any] = {}
@@ -118,7 +119,7 @@ def namespace_generate(
                 if (
                     warn_for_accident_declare
                     and not i.__no_warn__
-                    and not i.__collector__.upstream_target
+                    and not isinstance(i, UpstreamCollector)
                     and i not in manually
                 ):
                     warnings.warn(

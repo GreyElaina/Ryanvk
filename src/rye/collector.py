@@ -18,19 +18,6 @@ class BaseCollector:
     artifacts: MutableMapping[Any, Any]
     collected_callbacks: list[Callable[[type[BasePerform]], Any]]
 
-    _upstream_target: bool = False
-
-    @property
-    def upstream_target(self):
-        return self._upstream_target
-
-    @upstream_target.setter
-    def _upstream_target_setter(self, value: bool):
-        self._upstream_target = value
-
-        if value:
-            self.artifacts = ArtifactDest.get(None) or {}
-
     def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
         self.artifacts = artifacts or {}
         self.collected_callbacks = [self.__post_collected__]
@@ -62,3 +49,14 @@ class BaseCollector:
         **kwargs: P.kwargs,
     ) -> R:
         return signature.collect(self, *args, **kwargs)
+
+
+class UpstreamCollector(BaseCollector):
+    def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
+        super().__init__(artifacts)
+        
+        value = ArtifactDest.get(None)
+        if value is None:
+            raise RuntimeError("UpstreamCollector must be used with a available upstream.")
+    
+        
