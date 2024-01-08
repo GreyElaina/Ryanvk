@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
 
 from typing_extensions import Self
 
-from ._runtime import ArtifactDest
+from ._runtime import UpstreamArtifacts
 from .perform import BasePerform
 
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ class UpstreamCollector(BaseCollector):
     def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
         super().__init__(artifacts)
         
-        value = ArtifactDest.get(None)
+        value = UpstreamArtifacts.get(None)
         if value is None:
             raise RuntimeError("UpstreamCollector must be used with a available upstream.")
         self.artifacts = {**value, **(artifacts or {})}

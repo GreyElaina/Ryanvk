@@ -8,7 +8,7 @@ from rye.layout import DetailedArtifacts
 GlobalArtifacts = DetailedArtifacts()
 GlobalArtifacts.protected = True
 
-ArtifactDest: ContextVar[MutableMapping[Any, Any]] = ContextVar("ArtifactDest")
+UpstreamArtifacts: ContextVar[MutableMapping[Any, Any]] = ContextVar("UpstreamArtifacts")
 # FIXME: immutable by default, mutable partially.
 
 Layout: ContextVar[MutableSequence[DetailedArtifacts[Any, Any]]] = ContextVar("Layout")

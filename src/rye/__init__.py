@@ -1,5 +1,5 @@
 from ._capability import capability as capability
-from ._runtime import ArtifactDest as ArtifactDest
+from ._runtime import UpstreamArtifacts as UpstreamArtifacts
 from .collector import BaseCollector as BaseCollector
 from .fn import Fn as Fn
 from .fn import FnCompose as FnCompose

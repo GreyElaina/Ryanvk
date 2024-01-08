@@ -22,7 +22,7 @@ from rye.fn.record import FnImplement
 from rye.layout import DetailedArtifacts
 from rye.topic import merge_topics_if_possible
 
-from ._runtime import AccessStack, ArtifactDest, GlobalArtifacts, Instances, Layout
+from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout, UpstreamArtifacts
 from .typing import R1, P, Q, R, inTC
 from .utilities import standalone_context
 
@@ -309,7 +309,7 @@ def namespace_generate(
     def wrapper(func: Callable[[], None | Generator[type[BasePerform], None, Any]]):
         namespace: dict[Any, Any] = {}
         manually = set()
-        token = ArtifactDest.set(namespace)
+        token = UpstreamArtifacts.set(namespace)
 
         before = None
         if warning:
@@ -323,7 +323,7 @@ def namespace_generate(
             else:
                 func()
         finally:
-            ArtifactDest.reset(token)
+            UpstreamArtifacts.reset(token)
 
         if before is not None:
             for i in list(_gen_subclass(BasePerform))[1:]:
