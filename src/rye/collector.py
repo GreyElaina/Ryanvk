@@ -58,5 +58,4 @@ class UpstreamCollector(BaseCollector):
         value = ArtifactDest.get(None)
         if value is None:
             raise RuntimeError("UpstreamCollector must be used with a available upstream.")
-    
-        
+        self.artifacts = {**value, **(artifacts or {})}
