@@ -61,16 +61,6 @@ def isolate(backwards_protect: bool = True):
             i.protected = False
         Layout.reset(token)
 
-
-@contextmanager
-def mutable(target: DetailedArtifacts):
-    target.protected = False
-    try:
-        yield
-    finally:
-        target.protected = True
-
-
 @overload
 def instances(*, context: Literal[False] = False, nullaware: Literal[True] = True) -> MutableMapping[type, Any]:
     ...
