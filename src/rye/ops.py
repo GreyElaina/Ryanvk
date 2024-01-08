@@ -38,7 +38,11 @@ def shallow():
 
 
 @contextmanager
-def isolate(*collections: MutableMapping[Any, Any] | DetailedArtifacts, default_protected: bool = True):
+def isolate(
+    *collections: MutableMapping[Any, Any] | DetailedArtifacts,
+    default_protected: bool = True,
+    inherits: bool = True,
+):
     colls = [*collections]
 
     for index, value in enumerate(colls):
@@ -46,8 +50,13 @@ def isolate(*collections: MutableMapping[Any, Any] | DetailedArtifacts, default_
             v = DetailedArtifacts(value)
             v.protected = default_protected
             colls[index] = v
-
-    token = Layout.set([*colls, GlobalArtifacts])  # type: ignore
+            
+    if inherits:
+        upstream = layout()
+    else:
+        upstream = [GlobalArtifacts]
+    
+    token = Layout.set([*colls, *upstream])  # type: ignore
     try:
         yield
     finally:
