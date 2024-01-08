@@ -42,6 +42,7 @@ def isolate(
     *collections: MutableMapping[Any, Any] | DetailedArtifacts,
     default_protected: bool = True,
     inherits: bool = True,
+    protect_upstream: bool = True,
 ):
     colls = [*collections]
 
@@ -56,10 +57,20 @@ def isolate(
     else:
         upstream = [GlobalArtifacts]
     
+    if protect_upstream:
+        protected = [i for i in upstream if not i.protected]
+    else:
+        protected = []
+    
+    for protect_target in protected:
+        protect_target.protected = True
+
     token = Layout.set([*colls, *upstream])  # type: ignore
     try:
         yield
     finally:
+        for i in protected:
+            i.protected = False
         Layout.reset(token)
 
 
