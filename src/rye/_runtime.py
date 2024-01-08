@@ -9,8 +9,6 @@ GlobalArtifacts = DetailedArtifacts()
 GlobalArtifacts.protected = True
 
 UpstreamArtifacts: ContextVar[MutableMapping[Any, Any]] = ContextVar("UpstreamArtifacts")
-# FIXME: immutable by default, mutable partially.
-
 Layout: ContextVar[MutableSequence[DetailedArtifacts[Any, Any]]] = ContextVar("Layout")
 Instances: ContextVar[MutableMapping[type, Any]] = ContextVar("Instances")
 AccessStack: ContextVar[MutableMapping[Any, list[int]]] = ContextVar("AccessStack")

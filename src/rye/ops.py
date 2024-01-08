@@ -42,34 +42,18 @@ def shallow():
 
 
 @contextmanager
-def isolate(
-    *collections: MutableMapping[Any, Any] | DetailedArtifacts,
-    default_protected: bool = True,
-    inherits: bool = True,
-    protect_upstream: bool = True,
-):
-    colls = [*collections]
+def isolate(backwards_protect: bool = True):
+    upstream = layout()
 
-    for index, value in enumerate(colls):
-        if not isinstance(value, DetailedArtifacts):
-            v = DetailedArtifacts(value)
-            v.protected = default_protected
-            colls[index] = v
-            
-    if inherits:
-        upstream = layout()
-    else:
-        upstream = [GlobalArtifacts]
-    
-    if protect_upstream:
+    if backwards_protect:
         protected = [i for i in upstream if not i.protected]
     else:
         protected = []
-    
+
     for protect_target in protected:
         protect_target.protected = True
 
-    token = Layout.set([*colls, *upstream])  # type: ignore
+    token = Layout.set([*upstream])
     try:
         yield
     finally:
@@ -85,6 +69,7 @@ def mutable(target: DetailedArtifacts):
         yield
     finally:
         target.protected = True
+
 
 @overload
 def instances(*, context: Literal[False] = False, nullaware: Literal[True] = True) -> MutableMapping[type, Any]:
@@ -273,6 +258,7 @@ def is_implemented(
 
     return False
 
+
 _T = TypeVar("_T")
 
 
@@ -346,3 +332,7 @@ def namespace_generate(
         return namespace
 
     return wrapper
+
+
+def inject(*performs: type[BasePerform]):
+    merge_topics_if_possible([perform.__collector__.artifacts for perform in performs], layout())
