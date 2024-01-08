@@ -24,7 +24,7 @@ from rye.topic import merge_topics_if_possible
 
 from ._runtime import AccessStack, GlobalArtifacts, Instances, Layout, UpstreamArtifacts
 from .typing import R1, P, Q, R, inTC
-from .utilities import standalone_context
+from .utils import standalone_context
 
 if TYPE_CHECKING:
     from ._capability import CapabilityPerform
