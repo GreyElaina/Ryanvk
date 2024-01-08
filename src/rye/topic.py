@@ -36,12 +36,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
         ...
 
     def merge(self, inbound: list[T], outbound: list[DetailedArtifacts[Self, T]]) -> None:
-        for index, value in enumerate(outbound):
-            if value.protected:
-                outbound_depth = index
-                break
-        else:
-            outbound_depth = len(outbound)
+        outbound_depth = len(outbound)
 
         grouped: dict[S, list[tuple[T, E] | None]] = {}
         record_update_tasks = []
@@ -82,11 +77,6 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                 if self.has_entity(target_record, identity):
                     e = self.get_entity(target_record, identity)
                     group[group_index] = (target_record, e)
-                    # FIXME: flatten_record 会把副作用加在 target_record 上，这会覆盖掉 group 内部缓存的同一个 target_record，
-                    #        导致后面的 flatten_record 行为不是我们想要的。
-                    #        我想这个应该可以缓存住，然后我全部干完了再说……似乎也不行，至少正序的不行，那么逆序的情况呢？
-                    #        回去再说吧，至少你没用上 deepcopy。
-                    # TODO: 显然，我们需要对这一部分进行 review。
                     record_update_tasks.append((lambda x, y: lambda: self.flatten_record(x, y))(record, target_record))
                     self.flatten_entity(target_record, identity, entity, e)
                 else:
@@ -105,6 +95,18 @@ def merge_topics_if_possible(
     *,
     replace_non_topic: bool = True,
 ) -> None:
+    for index, value in enumerate(outbound):
+        if value.protected:
+            outbound_depth = index
+            break
+    else:
+        outbound_depth = len(outbound)
+    
+    protected = outbound[outbound_depth:]
+    unprotected = outbound[:outbound_depth]
+    outbound.clear()
+    outbound.extend(unprotected)
+
     topic_pair_records: dict[Topic, list[Any]] = {}
 
     done_replace = set()
@@ -124,3 +126,5 @@ def merge_topics_if_possible(
 
     for topic, records in topic_pair_records.items():
         topic.merge(records, outbound)
+
+    outbound.extend(protected)
