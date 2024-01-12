@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol,
 from rye.entity import BaseEntity
 from rye.fn.compose import FnCompose
 from rye.fn.entity import FnImplementEntity
-from rye.ops import callee_of
+from rye.operator import callee_of
 from rye.typing import (
     P1,
     R1,

@@ -53,15 +53,15 @@
   - layout
     - only-global
     - local
-      - mutable
-      - immutable
-    - protected sections
-      - default-cases
+      - mutable (wip)
+      - immutable (wip)
+    - protected sections (wip)
+      - default-cases (wip)
   - shallow
     - only-global is global
     - local is local
   - isolate
-    - immutable declare
+    - immutable declare (wip)
   - instances
     - no-context
     - context

@@ -54,7 +54,7 @@ class BaseCollector:
 class UpstreamCollector(BaseCollector):
     def __init__(self, artifacts: dict[Any, Any] | None = None) -> None:
         super().__init__(artifacts)
-        
+
         value = UpstreamArtifacts.get(None)
         if value is None:
             raise RuntimeError("UpstreamCollector must be used with a available upstream.")

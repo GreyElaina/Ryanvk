@@ -5,7 +5,7 @@ from typing import Protocol, TypeVar, overload, reveal_type
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
-from rye.ops import isolate, layout
+from rye.operator import isolate_layout, layout
 from rye.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
@@ -76,8 +76,14 @@ class TestPerformAlt((n := BaseCollector())._):
     def test_impl_int(self, value: type[str]) -> str:
         return "手杖闷闷作响，空气振振有声。"
 
+    @n.collect
+    @TestPerform.test.implements(type=int)
+    def test_impl_(self, value: type[int]) -> int:
+        return 25565
 
-with isolate():
+
+
+with isolate_layout():
     from devtools import debug
 
     debug(layout())
@@ -90,4 +96,4 @@ with isolate():
     reveal_type(TestPerform.test)
     c = TestPerform.test.callee(int)
 
-    print("??", repr(b))
+    print("??", repr(b), repr(c))

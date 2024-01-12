@@ -17,7 +17,7 @@ from typing import (
 )
 
 from rye.fn.record import FnImplement
-from rye.ops import instances
+from rye.operator import instances
 from rye.overloads import SingletonOverload
 from rye.typing import (
     ExplictImplementShape,
@@ -104,8 +104,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         collector, implement = twin
         instances_context = instances()
 
-        # TODO: 这里实例化迟早给他改掉，然后换 Lifespan.
-        # 怎么感觉像是早期 BCC -> 现代 BCC 的感觉。
+        # FIXME: no auto init
 
         if collector.cls not in instances_context:
             instance = instances_context[collector.cls] = collector.cls()

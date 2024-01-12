@@ -51,4 +51,3 @@ class BasePerform:
             i(cls)
 
         cls.__post_collected__(collector)
-

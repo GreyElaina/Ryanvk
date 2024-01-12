@@ -5,7 +5,7 @@ from typing import Protocol, TypeVar, reveal_type
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
-from rye.ops import isolate, layout
+from rye.operator import isolate_layout, layout
 from rye.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
@@ -44,7 +44,7 @@ class TestPerformAlt((n := BaseCollector())._):
     reveal_type(TestPerform.test.implements)
 
 
-with isolate():
+with isolate_layout():
     from devtools import debug
 
     debug(layout())

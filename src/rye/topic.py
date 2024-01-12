@@ -101,7 +101,7 @@ def merge_topics_if_possible(
             break
     else:
         outbound_depth = len(outbound)
-    
+
     protected = outbound[outbound_depth:]
     unprotected = outbound[:outbound_depth]
     outbound.clear()

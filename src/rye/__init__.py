@@ -6,16 +6,16 @@ from .fn import FnCompose as FnCompose
 from .fn import FnImplement as FnImplement
 from .fn import FnImplementEntity as FnImplementEntity
 from .fn import FnOverload as FnOverload
-from .ops import callee_of as callee_of
-from .ops import instance_of as instance_of
-from .ops import instances as instances
-from .ops import is_implemented as is_implemented
-from .ops import isolate as isolate
-from .ops import iter_artifacts as iter_artifacts
-from .ops import layout as layout
-from .ops import namespace_generate as namespace_generate
-from .ops import provide as provide
-from .ops import shallow as shallow
+from .operator import callee_of as callee_of
+from .operator import instances as instances
+from .operator import is_implemented as is_implemented
+from .operator import isolate_instances as isolate_instances
+from .operator import isolate_layout as isolate_layout
+from .operator import iter_artifacts as iter_artifacts
+from .operator import layout as layout
+from .operator import namespace_generate as namespace_generate
+from .operator import provide as provide
+from .operator import shallow as shallow
 from .overloads import (
     SimpleOverload as SimpleOverload,
 )
