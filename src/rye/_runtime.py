@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from contextvars import ContextVar
-from typing import Any, ChainMap, MutableMapping, MutableSequence
+from typing import TYPE_CHECKING, Any, ChainMap, MutableMapping, MutableSequence
 
 from rye.layout import DetailedArtifacts
+
+if TYPE_CHECKING:
+    from rye.lifespan import AsyncLifespanHostShape, LifespanHostShape
 
 GlobalArtifacts = DetailedArtifacts()
 GlobalArtifacts.protected = True
@@ -15,3 +18,6 @@ AccessStack: ContextVar[MutableMapping[Any, list[int]]] = ContextVar("AccessStac
 
 GlobalInstances = {}
 NewInstances: ContextVar[ChainMap[type, Any]] = ContextVar("NewInstances", default=ChainMap(GlobalInstances))
+
+LifespanHost: ContextVar[LifespanHostShape] = ContextVar("LifespanHost")
+AsyncLifespanHost: ContextVar[AsyncLifespanHostShape] = ContextVar("AsyncLifespanHost")

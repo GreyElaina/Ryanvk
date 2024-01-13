@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import cycle
-from typing import Any, Generic, MutableMapping, MutableSequence, Self, TypeVar
+from typing import Any, Generic, Iterable, MutableMapping, MutableSequence, Self, TypeVar
 
 from .layout import DetailedArtifacts
 
@@ -90,7 +90,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
 
 
 def merge_topics_if_possible(
-    inbounds: MutableSequence[MutableMapping[Any, Any] | DetailedArtifacts[Any, Any]],
+    inbounds: Iterable[MutableMapping[Any, Any] | DetailedArtifacts[Any, Any]],
     outbound: MutableSequence[DetailedArtifacts[Any, Any]],
     *,
     replace_non_topic: bool = True,
