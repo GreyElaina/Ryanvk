@@ -7,7 +7,6 @@ from typing import (
 )
 
 from rye._runtime import Layout, NewInstances
-from rye.operator.context import instances, layout
 
 if TYPE_CHECKING:
     pass
@@ -15,6 +14,8 @@ if TYPE_CHECKING:
 
 @contextmanager
 def isolate_layout(backwards_protect: bool = True):
+    from rye.operator.context import layout
+
     upstream = layout()
 
     if backwards_protect:
@@ -36,6 +37,8 @@ def isolate_layout(backwards_protect: bool = True):
 
 @contextmanager
 def isolate_instances():
+    from rye.operator.context import instances
+
     current_layout = instances()
     token = NewInstances.set(ChainMap({}, *current_layout.maps))
 

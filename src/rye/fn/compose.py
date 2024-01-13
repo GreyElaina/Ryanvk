@@ -6,7 +6,6 @@ from contextvars import ContextVar
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Final, Generic, Iterable, Self, overload
 
 from rye.fn.record import FnImplement
-from rye.operator import instances
 from rye.overloads import SingletonOverload
 from rye.typing import (
     ExplictImplementShape,
@@ -88,6 +87,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         return list(self._incompleted_result.keys())
 
     def ensure_twin(self, twin: Twin) -> Callable:
+        from rye.operator import instances
         collector, implement = twin
         instances_context = instances()
 

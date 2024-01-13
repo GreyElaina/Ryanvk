@@ -7,6 +7,7 @@ from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
 from rye.operator import is_implemented, isolate_layout, layout
+from rye.operator.context import using_sync
 from rye.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
@@ -91,19 +92,10 @@ class TestPerformAlt2((n := BaseCollector())._):
 # a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
 
-with isolate_layout():
+with using_sync(TestPerformAlt2(), TestPerformAlt1(), TestPerformAlt()):
     from devtools import debug
 
-    debug(layout())
-
-    merge_topics_if_possible(
-        [
-            TestPerformAlt2.__collector__.artifacts,
-            TestPerformAlt1.__collector__.artifacts,
-            TestPerformAlt.__collector__.artifacts,
-        ],
-        layout(),
-    )
+    #debug(layout())
 
     debug(layout())
     debug(GlobalArtifacts)

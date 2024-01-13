@@ -9,6 +9,7 @@ from typing import (
 
 from rye._runtime import GlobalArtifacts, Layout, NewInstances
 from rye.layout import DetailedArtifacts
+from rye.operator.isolate import isolate_instances, isolate_layout
 from rye.topic import merge_topics_if_possible
 
 if TYPE_CHECKING:
@@ -47,14 +48,13 @@ def instance_of(cls: type):
 @contextmanager
 def using_sync(*performs: BasePerform):
     from rye.lifespan import AsyncLifespan, Lifespan
-    from rye.operator.isolate import isolate_layout
+    from rye.operator.context import instances
 
     with ExitStack() as stack:
         collection = [i.__collector__.artifacts for i in performs]
 
         for artifacts in collection:
             with isolate_layout():
-                # TODO: 可能得用 compose 形式写 lifespan, 在 call 里面直接调完。
                 merge_topics_if_possible([artifacts], layout())
 
                 if AsyncLifespan.compose_instance.signature() in artifacts:
@@ -65,13 +65,20 @@ def using_sync(*performs: BasePerform):
 
         stack.enter_context(isolate_layout())
         merge_topics_if_possible(collection, layout())
+
+        stack.enter_context(isolate_instances())
+
+        instance_record = instances()
+        
+        for instance in performs:
+            instance_record[type(instance)] = instance
+        
         yield
 
 
 @asynccontextmanager
 async def using_async(*performs: BasePerform):
     from rye.lifespan import AsyncLifespan, Lifespan
-    from rye.operator.isolate import isolate_layout
 
     async with AsyncExitStack() as stack:
         collections = [i.__collector__.artifacts for i in performs]
@@ -88,4 +95,12 @@ async def using_async(*performs: BasePerform):
 
         stack.enter_context(isolate_layout())
         merge_topics_if_possible(collections, layout())
+
+        stack.enter_context(isolate_instances())
+
+        instance_record = instances()
+        
+        for instance in performs:
+            instance_record[type(instance)] = instance
+        
         yield

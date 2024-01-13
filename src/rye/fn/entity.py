@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 class FnImplementCollectCallback:
     implemented: dict[type[BasePerform], set[Fn]] = field(default_factory=dict)
 
-    def __call__(self, impl_collection: type[BasePerform]):
+    def __call__(self, _: type[BasePerform]):
         for owner, fns in self.implemented.items():
             if (
                 issubclass(owner, CapabilityPerform)

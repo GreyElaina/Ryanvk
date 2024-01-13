@@ -3,6 +3,8 @@ from .context import instances as instances
 from .context import layout as layout
 from .context import provide as provide
 from .context import shallow as shallow
+from .context import using_async as using_async
+from .context import using_sync as using_sync
 from .fn import callee_of as callee_of
 from .fn import is_implemented as is_implemented
 from .isolate import isolate_instances as isolate_instances
