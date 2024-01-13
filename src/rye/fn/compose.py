@@ -3,18 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Concatenate,
-    ContextManager,
-    Final,
-    Generic,
-    Iterable,
-    Self,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Final, Generic, Iterable, Self, overload
 
 from rye.fn.record import FnImplement
 from rye.operator import instances
@@ -99,17 +88,13 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         return list(self._incompleted_result.keys())
 
     def ensure_twin(self, twin: Twin) -> Callable:
-        # 然后是 instance maintainer，同时也是 lifespan manager，不过因为我的原因会把他们分开来。
-        # TODO: 这个还是之后再说，先拿 Staff 和 Static Perform 顶上。
         collector, implement = twin
         instances_context = instances()
 
-        # FIXME: no auto init
-
         if collector.cls not in instances_context:
-            instance = instances_context[collector.cls] = collector.cls()
-        else:
-            instance = instances_context[collector.cls]
+            raise NotImplementedError("cannot find such perform in instances")
+        
+        instance = instances_context[collector.cls]
 
         def wrapper(*args, **kwargs):
             return implement(instance, *args, **kwargs)
