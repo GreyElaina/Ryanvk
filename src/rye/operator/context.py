@@ -4,7 +4,6 @@ from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextma
 from typing import (
     TYPE_CHECKING,
     Any,
-    Iterable,
     MutableSequence,
 )
 
@@ -45,63 +44,48 @@ def instance_of(cls: type):
     return instances()[cls]
 
 
-class UsingControl:
-    performs: Iterable[BasePerform]
+@contextmanager
+def using_sync(*performs: BasePerform):
+    from rye.lifespan import AsyncLifespan, Lifespan
+    from rye.operator.isolate import isolate_layout
 
-    def __init__(self, performs: Iterable[BasePerform]) -> None:
-        self.performs = performs
+    with ExitStack() as stack:
+        collection = [i.__collector__.artifacts for i in performs]
 
-    async def __await_impl__(self):
-        ...  # TODO
+        for artifacts in collection:
+            with isolate_layout():
+                # TODO: 可能得用 compose 形式写 lifespan, 在 call 里面直接调完。
+                merge_topics_if_possible([artifacts], layout())
 
-    def __await__(self):
-        return self.__await_impl__().__await__()
+                if AsyncLifespan.compose_instance.signature() in artifacts:
+                    raise RuntimeError("AsyncLifespan is not supported in sync_context()")
 
-    @asynccontextmanager
-    async def async_context(self):
-        from rye.lifespan import AsyncLifespan, Lifespan
-        from rye.operator.isolate import isolate_layout
+                if Lifespan.compose_instance.signature() in artifacts:
+                    stack.enter_context(Lifespan.callee())
 
-        async with AsyncExitStack() as stack:
-            collections = [i.__collector__.artifacts for i in self.performs]
-
-            for artifacts in collections:
-                with isolate_layout():
-                    merge_topics_if_possible([artifacts], layout())
-
-                    if Lifespan.compose_instance.signature() in artifacts:
-                        stack.enter_context(Lifespan.callee())
-
-                    if AsyncLifespan.compose_instance.signature() in artifacts:
-                        await stack.enter_async_context(AsyncLifespan.callee())
-
-            stack.enter_context(isolate_layout())
-            merge_topics_if_possible(collections, layout())
-            yield
-
-    @contextmanager
-    def sync_context(self):
-        from rye.lifespan import AsyncLifespan, Lifespan
-        from rye.operator.isolate import isolate_layout
-
-        with ExitStack() as stack:
-            collection = [i.__collector__.artifacts for i in self.performs]
-
-            for artifacts in collection:
-                with isolate_layout():
-                    # TODO: 可能得用 compose 形式写 lifespan, 在 call 里面直接调完。
-                    merge_topics_if_possible([artifacts], layout())
-
-                    if AsyncLifespan.compose_instance.signature() in artifacts:
-                        raise RuntimeError("AsyncLifespan is not supported in sync_context()")
-
-                    if Lifespan.compose_instance.signature() in artifacts:
-                        stack.enter_context(Lifespan.callee())
-
-            stack.enter_context(isolate_layout())
-            merge_topics_if_possible(collection, layout())
-            yield
+        stack.enter_context(isolate_layout())
+        merge_topics_if_possible(collection, layout())
+        yield
 
 
-def using(*performs: BasePerform):
-    return UsingControl(performs)
+@asynccontextmanager
+async def using_async(*performs: BasePerform):
+    from rye.lifespan import AsyncLifespan, Lifespan
+    from rye.operator.isolate import isolate_layout
+
+    async with AsyncExitStack() as stack:
+        collections = [i.__collector__.artifacts for i in performs]
+
+        for artifacts in collections:
+            with isolate_layout():
+                merge_topics_if_possible([artifacts], layout())
+
+                if Lifespan.compose_instance.signature() in artifacts:
+                    stack.enter_context(Lifespan.callee())
+
+                if AsyncLifespan.compose_instance.signature() in artifacts:
+                    await stack.enter_async_context(AsyncLifespan.callee())
+
+        stack.enter_context(isolate_layout())
+        merge_topics_if_possible(collections, layout())
+        yield
