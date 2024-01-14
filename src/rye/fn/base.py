@@ -73,6 +73,17 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
         # TODO: 考虑将其直接作为 __init__。
         return cls(compose_cls)  # type: ignore
 
+    @classmethod
+    def override(cls: type[Fn[collectShape, Callable[P, R]]], target: Fn):
+        def wrapper(
+            compose_cls: type[FnMethodComposeCls[collectShape, Callable[P, FnComposeCallReturnType[R]]]]
+        ) -> Fn[collectShape, Callable[P, R]]:
+            comp = cls.compose(compose_cls)
+            comp.compose_instance.signature = target.compose_instance.signature
+            return comp
+
+        return wrapper
+
     @property
     def ownership(self):
         if self.collector is not None:

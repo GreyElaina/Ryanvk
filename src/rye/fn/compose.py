@@ -88,6 +88,7 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
 
     def ensure_twin(self, twin: Twin) -> Callable:
         from rye.operator import instances
+        
         collector, implement = twin
         instances_context = instances()
 

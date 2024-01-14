@@ -16,15 +16,9 @@ from .operator import layout as layout
 from .operator import namespace_generate as namespace_generate
 from .operator import provide as provide
 from .operator import shallow as shallow
-from .overloads import (
-    SimpleOverload as SimpleOverload,
-)
-from .overloads import (
-    SingletonOverload as SingletonOverload,
-)
-from .overloads import (
-    TypeOverload as TypeOverload,
-)
+from .overloads import SimpleOverload as SimpleOverload
+from .overloads import SingletonOverload as SingletonOverload
+from .overloads import TypeOverload as TypeOverload
 from .perform import BasePerform as BasePerform
 from .topic import PileTopic as PileTopic
 from .topic import Topic as Topic
