@@ -87,14 +87,14 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         return list(self._incompleted_result.keys())
 
     def ensure_twin(self, twin: Twin) -> Callable:
-        from rye.operator import instances
-        
+        from rye.operators import instances
+
         collector, implement = twin
         instances_context = instances()
 
         if collector.cls not in instances_context:
             raise NotImplementedError("cannot find such perform in instances")
-        
+
         instance = instances_context[collector.cls]
 
         def wrapper(*args, **kwargs):

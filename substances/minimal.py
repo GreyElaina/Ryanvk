@@ -5,8 +5,7 @@ from typing import Protocol, TypeVar, reveal_type
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
-from rye.operator import isolate_layout, layout, using_sync
-from rye.operator.context import instances
+from rye.operators import instances, is_implemented, isolate_layout, layout, using_sync
 from rye.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
