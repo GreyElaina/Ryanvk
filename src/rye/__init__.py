@@ -12,7 +12,6 @@ from .operator import isolate_instances as isolate_instances
 from .operator import isolate_layout as isolate_layout
 from .operator import iter_artifacts as iter_artifacts
 from .operator import layout as layout
-from .operator import namespace_generate as namespace_generate
 from .operator import provide as provide
 from .operator import shallow as shallow
 from .overloads import SimpleOverload as SimpleOverload
