@@ -17,7 +17,7 @@ from rye.fn.record import FnOverloadHarvest
 from rye.typing import Twin
 
 if TYPE_CHECKING:
-    from .compose import FnCompose
+    from rye.fn.compose import FnCompose
 
 On = TypeVar("On", bound="FnOverload", covariant=True)
 TCallValue = TypeVar("TCallValue")

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
-from .collector import BaseCollector
-from .perform import BasePerform
+from rye.collector import BaseCollector
+from rye.perform import BasePerform
 
 if TYPE_CHECKING:
-    from .fn import Fn
-    from .fn.base import Callable, FnComposeCallReturnType, FnMethodComposeCls, P, R, collectShape, inTC
+    from rye.fn import Fn
+    from rye.fn.base import FnComposeCallReturnType, FnMethodComposeCls, collectShape
+    from rye.typing import P, R, inTC
 
 
 class CapabilityPerform(BasePerform, keep_native=True):

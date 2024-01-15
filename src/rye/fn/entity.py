@@ -4,14 +4,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Generic, cast, overload
 
 try:
-    from typing import Concatenate
+    from typing import Concatenate, Self
 except ImportError:
-    from typing_extensions import Concatenate
-
-try:
-    from typing import Self
-except ImportError:
-    from typing_extensions import Self
+    from typing_extensions import Concatenate, Self
 
 from rye._capability import CapabilityPerform
 from rye.collector import BaseCollector

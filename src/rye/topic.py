@@ -3,7 +3,7 @@ from __future__ import annotations
 from itertools import cycle
 from typing import Any, Generic, Iterable, MutableMapping, MutableSequence, Self, TypeVar
 
-from .layout import DetailedArtifacts
+from rye.layout import DetailedArtifacts
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -51,8 +51,6 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                 group.append((record, entity))
 
         for identity, group in grouped.items():
-            # identity: 标记 entity 用的，对于 fn 的情况，就是 overload 的 harvest 了
-            # group: list[E]
             outbound_index = 0
             for group_index in cycle(range(len(group))):
                 twin = group[group_index]
@@ -78,6 +76,7 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                     e = self.get_entity(target_record, identity)
                     group[group_index] = (target_record, e)
                     record_update_tasks.append((lambda x, y: lambda: self.flatten_record(x, y))(record, target_record))
+                    # 猜想：swap
                     self.flatten_entity(target_record, identity, entity, e)
                 else:
                     group[group_index] = None

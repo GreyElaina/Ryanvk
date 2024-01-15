@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generic, Protocol, TypeVar
+from typing import Any, Callable, Concatenate, Generic, Protocol, TypeVar
 
 from rye.entity import BaseEntity
 from rye.fn.compose import FnCompose
@@ -17,9 +17,6 @@ from rye.typing import (
     inTC,
     specifiedCollectP,
 )
-
-if TYPE_CHECKING:
-    pass
 
 K = TypeVar("K")
 

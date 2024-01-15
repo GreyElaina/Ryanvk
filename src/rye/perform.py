@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
-    from .collector import BaseCollector
+    from rye.collector import BaseCollector
 
 
 class BasePerform:
@@ -27,11 +27,7 @@ class BasePerform:
     def __post_collected__(cls, collect: BaseCollector):
         ...
 
-    def __init_subclass__(
-        cls,
-        *,
-        keep_native: bool = False,
-    ) -> None:
+    def __init_subclass__(cls, *, keep_native: bool = False) -> None:
         cls.__native__ = keep_native
         if keep_native:
             return

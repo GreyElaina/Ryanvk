@@ -7,9 +7,8 @@ from rye.topic import PileTopic
 from rye.typing import Twin
 
 if TYPE_CHECKING:
+    from rye.fn.base import Fn
     from rye.fn.overload import FnOverload
-
-    from .base import Fn
 
 
 class FnRecord(TypedDict):

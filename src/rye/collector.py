@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from contextlib import AbstractContextManager
-from typing import TYPE_CHECKING, Any, Callable, MutableMapping, TypeVar
+from typing import Any, Callable, MutableMapping, TypeVar
 
 from typing_extensions import Self
 
 from .perform import BasePerform
-
-if TYPE_CHECKING:
-    from .typing import P, R, SupportsCollect
+from .typing import P, R, SupportsCollect
 
 T = TypeVar("T")
 
@@ -36,10 +33,6 @@ class BaseCollector:
 
     def remove_collected_callback(self, func: Callable[[type], Any]):
         self.collected_callbacks.remove(func)
-
-    def using(self, context_manager: AbstractContextManager[T]) -> T:
-        self.on_collected(lambda _: context_manager.__exit__(None, None, None))
-        return context_manager.__enter__()
 
     def collect(
         self,

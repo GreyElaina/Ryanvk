@@ -3,9 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from rye.fn.overload import FnOverload
 from rye.typing import Twin
-
-from .fn.overload import FnOverload
 
 
 @dataclass(eq=True, frozen=True)
