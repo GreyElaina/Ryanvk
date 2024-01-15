@@ -7,7 +7,7 @@ from typing import (
     MutableSequence,
 )
 
-from rye._runtime import GlobalArtifacts, Layout, NewInstances
+from rye._runtime import GlobalArtifacts, Instances, Layout
 from rye.layout import DetailedArtifacts
 from rye.operator.isolate import isolate_instances, isolate_layout
 from rye.topic import merge_topics_if_possible
@@ -25,7 +25,7 @@ def shallow():
 
 
 def instances():
-    return NewInstances.get()
+    return Instances.get()
 
 
 @contextmanager

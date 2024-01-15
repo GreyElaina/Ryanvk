@@ -6,7 +6,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from rye._runtime import Layout, NewInstances
+from rye._runtime import Instances, Layout
 
 if TYPE_CHECKING:
     pass
@@ -40,9 +40,9 @@ def isolate_instances():
     from rye.operator.context import instances
 
     current_layout = instances()
-    token = NewInstances.set(ChainMap({}, *current_layout.maps))
+    token = Instances.set(ChainMap({}, *current_layout.maps))
 
     try:
         yield
     finally:
-        NewInstances.reset(token)
+        Instances.reset(token)

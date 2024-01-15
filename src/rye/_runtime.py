@@ -8,10 +8,9 @@ from rye.layout import DetailedArtifacts
 GlobalArtifacts = DetailedArtifacts()
 GlobalArtifacts.protected = True
 
-UpstreamArtifacts: ContextVar[MutableMapping[Any, Any]] = ContextVar("UpstreamArtifacts")
-Layout: ContextVar[MutableSequence[DetailedArtifacts[Any, Any]]] = ContextVar("Layout")
-Instances: ContextVar[MutableMapping[type, Any]] = ContextVar("Instances")
-AccessStack: ContextVar[MutableMapping[Any, list[int]]] = ContextVar("AccessStack")
-
 GlobalInstances = {}
-NewInstances: ContextVar[ChainMap[type, Any]] = ContextVar("NewInstances", default=ChainMap(GlobalInstances))
+Instances: ContextVar[ChainMap[type, Any]] = ContextVar("Instances", default=ChainMap(GlobalInstances))
+
+AccessStack: ContextVar[MutableMapping[Any, list[int]]] = ContextVar("AccessStack")
+Layout: ContextVar[MutableSequence[DetailedArtifacts[Any, Any]]] = ContextVar("Layout")
+UpstreamArtifacts: ContextVar[MutableMapping[Any, Any]] = ContextVar("UpstreamArtifacts")

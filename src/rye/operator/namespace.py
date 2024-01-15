@@ -81,7 +81,7 @@ def namespace_generate(
                     and i not in manually
                 ):
                     warnings.warn(
-                        f'{i.__module__}:{i.__name__} does not use the "upstream_target = True" setting.'
+                        f'{i.__module__}:{i.__name__} does not inherit from UpstreamCollector.'
                         "It may have been imported accidentally or not yielded by this generator."
                         "Both scenarios are likely unintended. Please have a developer review this.",
                         ImportWarning,
