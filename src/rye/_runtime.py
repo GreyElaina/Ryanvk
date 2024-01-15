@@ -13,4 +13,3 @@ Instances: ContextVar[ChainMap[type, Any]] = ContextVar("Instances", default=Cha
 
 AccessStack: ContextVar[MutableMapping[Any, list[int]]] = ContextVar("AccessStack")
 Layout: ContextVar[MutableSequence[DetailedArtifacts[Any, Any]]] = ContextVar("Layout")
-UpstreamArtifacts: ContextVar[MutableMapping[Any, Any]] = ContextVar("UpstreamArtifacts")
