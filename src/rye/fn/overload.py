@@ -19,7 +19,7 @@ from rye.typing import Twin
 if TYPE_CHECKING:
     from rye.fn.compose import FnCompose
 
-On = TypeVar("On", bound="FnOverload", covariant=True)
+TOverload = TypeVar("TOverload", bound="FnOverload", covariant=True)
 TCallValue = TypeVar("TCallValue")
 TCollectValue = TypeVar("TCollectValue")
 TSignature = TypeVar("TSignature")
@@ -46,12 +46,12 @@ class FnOverload(Generic[TSignature, TCollectValue, TCallValue]):
         ...
 
 
-class FnOverloadAgent(Generic[On]):
+class FnOverloadAgent(Generic[TOverload]):
     name: str
     compose: FnCompose
-    fn_overload: On
+    fn_overload: TOverload
 
-    def __init__(self, name: str, fn: FnCompose, overload: On):
+    def __init__(self, name: str, fn: FnCompose, overload: TOverload):
         self.name = name
         self.compose = fn
         self.fn_overload = overload
@@ -63,11 +63,11 @@ class FnOverloadAgent(Generic[On]):
         return FnOverloadHarvest(self.name, self.fn_overload, value)
 
 
-class FnOverloadAgentDescriptor(Generic[On]):
+class FnOverloadAgentDescriptor(Generic[TOverload]):
     name: str
-    fn_overload: On
+    fn_overload: TOverload
 
-    def __init__(self, fn_overload: On) -> None:
+    def __init__(self, fn_overload: TOverload) -> None:
         self.fn_overload = fn_overload
 
     def __set_name__(self, name: str, owner: type):
@@ -78,7 +78,7 @@ class FnOverloadAgentDescriptor(Generic[On]):
         ...
 
     @overload
-    def __get__(self, instance: FnCompose, owner: type) -> FnOverloadAgent[On]:
+    def __get__(self, instance: FnCompose, owner: type) -> FnOverloadAgent[TOverload]:
         ...
 
     def __get__(self, instance: FnCompose | None, owner: type):

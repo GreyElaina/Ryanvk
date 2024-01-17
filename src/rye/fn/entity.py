@@ -13,7 +13,7 @@ from rye.collector import BaseCollector
 from rye.entity import BaseEntity
 from rye.fn.record import FnRecord
 from rye.perform import BasePerform
-from rye.typing import P, R, inRC, specifiedCollectP
+from rye.typing import OutP, P, R, inRC
 
 if TYPE_CHECKING:
     from rye.fn.base import Fn
@@ -37,16 +37,16 @@ class FnImplementCollectCallback:
                 )
 
 
-class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
-    fn: Fn[Callable[Concatenate[Any, specifiedCollectP], Any], Any]
+class FnImplementEntity(Generic[inRC, OutP], BaseEntity):
+    fn: Fn[Callable[Concatenate[Any, OutP], Any], Any]
     impl: Callable[..., Any]
 
     def __init__(
-        self: FnImplementEntity[inRC, specifiedCollectP],
-        fn: Fn[Callable[Concatenate[Any, specifiedCollectP], Any], Any],
+        self,
+        fn: Fn[Callable[Concatenate[Any, OutP], Any], Any],
         impl: inRC,
-        *args: specifiedCollectP.args,
-        **kwargs: specifiedCollectP.kwargs,
+        *args: OutP.args,
+        **kwargs: OutP.kwargs,
     ):
         self.fn = fn
         self.impl = impl
@@ -54,10 +54,7 @@ class FnImplementEntity(Generic[inRC, specifiedCollectP], BaseEntity):
         self._collect_args = args
         self._collect_kwargs = kwargs
 
-    def collect(
-        self: FnImplementEntity[inRC, specifiedCollectP],
-        collector: BaseCollector,
-    ):
+    def collect(self, collector: BaseCollector):
         super().collect(collector)
 
         record_signature = self.fn.compose_instance.signature()

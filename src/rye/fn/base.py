@@ -6,17 +6,7 @@ from rye.entity import BaseEntity
 from rye.fn.compose import FnCompose
 from rye.fn.entity import FnImplementEntity
 from rye.operators import callee_of
-from rye.typing import (
-    P1,
-    R1,
-    FnComposeCallReturnType,
-    FnComposeCollectReturnType,
-    P,
-    R,
-    WrapCall,
-    inTC,
-    specifiedCollectP,
-)
+from rye.typing import P1, R1, FnComposeCallReturnType, FnComposeCollectReturnType, OutP, P, R, WrapCall, inTC
 
 K = TypeVar("K")
 
@@ -45,10 +35,10 @@ class FnSymmetricCompose(Generic[inTC], FnCompose):
         yield self.singleton.collect(None)
 
 
-class Detour(Protocol[R, specifiedCollectP]):
+class Detour(Protocol[R, OutP]):
     def __call__(
-        self: Detour[WrapCall[..., Callable[P1, R1]], specifiedCollectP], implement: Callable[Concatenate[K, P1], R1]
-    ) -> FnImplementEntity[Callable[Concatenate[K, P1], R1], specifiedCollectP]:
+        self: Detour[WrapCall[..., Callable[P1, R1]], OutP], implement: Callable[Concatenate[K, P1], R1]
+    ) -> FnImplementEntity[Callable[Concatenate[K, P1], R1], OutP]:
         ...
 
 
@@ -88,9 +78,9 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
 
     @property
     def implements(
-        self: Fn[Callable[Concatenate[inTC, specifiedCollectP], Any], Any]
-    ) -> Callable[specifiedCollectP, Detour[WrapCall[..., inTC], specifiedCollectP]]:
-        def wrapper(*args: specifiedCollectP.args, **kwargs: specifiedCollectP.kwargs):
+        self: Fn[Callable[Concatenate[inTC, OutP], Any], Any]
+    ) -> Callable[OutP, Detour[WrapCall[..., inTC], OutP]]:
+        def wrapper(*args: OutP.args, **kwargs: OutP.kwargs):
             def inner(impl: Callable[Concatenate[K, P], R]):
                 return FnImplementEntity(self, impl, *args, **kwargs)
 

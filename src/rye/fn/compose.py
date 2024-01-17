@@ -6,8 +6,10 @@ from contextvars import ContextVar
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Final, Generic, Iterable, Self, overload
 
 from rye.fn.record import FnImplement
+from rye.operators import instances
 from rye.overloads import SingletonOverload
 from rye.typing import (
+    P1,
     ExplictImplementShape,
     FnComposeCallReturnType,
     FnComposeCollectReturnType,
@@ -16,7 +18,6 @@ from rye.typing import (
     R,
     Twin,
     inTC,
-    unspecifiedCollectP,
 )
 
 if TYPE_CHECKING:
@@ -50,7 +51,7 @@ class FnCompose(ABC):
         ...
 
     @overload
-    def harvest(self: ImplementForCollect[unspecifiedCollectP]) -> ContextManager[EntitiesHarvest[unspecifiedCollectP]]:
+    def harvest(self: ImplementForCollect[P1]) -> ContextManager[EntitiesHarvest[P1]]:
         ...
 
     @contextmanager
@@ -65,9 +66,8 @@ class FnCompose(ABC):
             EntitiesHarvest.mutation_endpoint.reset(tok)
 
 
-class EntitiesHarvest(Generic[unspecifiedCollectP]):
-    mutation_endpoint: Final[ContextVar[Self]] = \
-        ContextVar("EntitiesHarvest.mutation_endpoint")  # fmt: off
+class EntitiesHarvest(Generic[P1]):
+    mutation_endpoint: Final[ContextVar[Self]] = ContextVar("EntitiesHarvest.mutation_endpoint")
 
     finished: bool = False
     _incompleted_result: dict[Twin, None] | None = None
@@ -87,8 +87,6 @@ class EntitiesHarvest(Generic[unspecifiedCollectP]):
         return list(self._incompleted_result.keys())
 
     def ensure_twin(self, twin: Twin) -> Callable:
-        from rye.operators import instances
-
         collector, implement = twin
         instances_context = instances()
 

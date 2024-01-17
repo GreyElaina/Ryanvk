@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol, TypeVar, overload, reveal_type
+from typing import Protocol, Sequence, TypeVar, overload, reveal_type
 
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
@@ -80,6 +80,12 @@ class TestPerformAlt((n := BaseCollector())._):
     @TestPerform.test.implements(type=int)
     def test_impl_(self, value: type[int]) -> int:
         return 25565
+
+    #@n.collect
+    @TestPerform.test.implements(type=Sequence[str])
+    def test_impl_1(self, value: type[Sequence[str]]) -> Sequence[str]:
+        ...
+
 
 
 

@@ -32,8 +32,8 @@ Q = TypeVar("Q", contravariant=True)
 
 K = TypeVar("K", contravariant=True, bound="BaseCollector")
 
-unspecifiedCollectP = ParamSpec("unspecifiedCollectP")
-specifiedCollectP = ParamSpec("specifiedCollectP")
+InP = ParamSpec("InP")
+OutP = ParamSpec("OutP")
 
 inRC = TypeVar("inRC", covariant=True, bound=Callable)
 inTC = TypeVar("inTC", bound=Callable)
@@ -44,8 +44,8 @@ class SupportsCollect(Protocol[K, P, R]):
         ...
 
 
-class ImplementForCollect(Protocol[unspecifiedCollectP]):
-    def collect(self, *args: unspecifiedCollectP.args, **kwargs: unspecifiedCollectP.kwargs) -> Any:
+class ImplementForCollect(Protocol[InP]):
+    def collect(self, *args: InP.args, **kwargs: InP.kwargs) -> Any:
         ...
 
 

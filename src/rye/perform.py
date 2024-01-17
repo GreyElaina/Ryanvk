@@ -16,9 +16,6 @@ class BasePerform:
     # when a perform is native, its ALL collector-based functions will be disabled,
     # the __collector__ attribute is unavailable too.
 
-    def __post_init__(self):
-        ...
-
     @classmethod
     def apply_to(cls, map: dict[Any, Any]):
         map.update(cls.__collector__.artifacts)

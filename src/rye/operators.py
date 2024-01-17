@@ -2,16 +2,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextmanager
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Concatenate,
-    Generator,
-    Generic,
-    MutableSequence,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, MutableSequence, overload
 
 from rye._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from rye.fn.record import FnImplement
@@ -108,7 +99,7 @@ def using_sync(*performs: BasePerform):
         for instance in performs:
             instance_record[type(instance)] = instance
 
-        yield
+        yield stack
 
 
 @asynccontextmanager
@@ -137,7 +128,7 @@ async def using_async(*performs: BasePerform):
         for instance in performs:
             instance_record[type(instance)] = instance
 
-        yield
+        yield stack
 
 
 class _WrapGenerator(Generic[R, Q, R1]):
@@ -214,9 +205,8 @@ def is_implemented(
                 return True
     else:
         fn_sign = target.compose_instance.signature()
-        pred = fn_sign in perform.__collector__.artifacts
 
-        if not pred:
+        if fn_sign not in perform.__collector__.artifacts:
             return False
 
         if not (args or kwargs):
@@ -247,10 +237,9 @@ def is_implemented(
 def isolate_layout(backwards_protect: bool = True):
     upstream = layout()
 
+    protected = []
     if backwards_protect:
         protected = [i for i in upstream if not i.protected]
-    else:
-        protected = []
 
     for protect_target in protected:
         protect_target.protected = True
@@ -266,8 +255,7 @@ def isolate_layout(backwards_protect: bool = True):
 
 @contextmanager
 def isolate_instances():
-    current_layout = instances()
-    token = Instances.set(ChainMap({}, *current_layout.maps))
+    token = Instances.set(ChainMap({}, *instances().maps))
 
     try:
         yield

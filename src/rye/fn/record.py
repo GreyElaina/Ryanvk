@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, MutableMapping, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from rye.topic import PileTopic
 from rye.typing import Twin
@@ -18,10 +18,10 @@ class FnRecord(TypedDict):
 
 
 @dataclass(eq=True, frozen=True)
-class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...], Twin]):
+class FnImplement(PileTopic):
     fn: Fn
 
-    def iter_entities(self, record: FnRecord) -> MutableMapping[frozenset[tuple[str, "FnOverload", Any]], Twin]:
+    def iter_entities(self, record: FnRecord):
         return record["entities"]
 
     def has_entity(
@@ -39,11 +39,7 @@ class FnImplement(PileTopic[FnRecord, tuple[tuple[str, "FnOverload", Any], ...],
         return record["entities"][signature]
 
     def new_record(self) -> FnRecord:
-        return {
-            "define": self.fn,
-            "overload_scopes": {},
-            "entities": {},
-        }
+        return {"define": self.fn, "overload_scopes": {}, "entities": {}}
 
     def flatten_record(self, record: FnRecord, target: FnRecord) -> None:
         target["define"] = record["define"]

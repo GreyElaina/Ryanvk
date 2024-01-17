@@ -76,7 +76,6 @@ class PileTopic(Generic[T, S, E], Topic[T]):
                     e = self.get_entity(target_record, identity)
                     group[group_index] = (target_record, e)
                     record_update_tasks.append((lambda x, y: lambda: self.flatten_record(x, y))(record, target_record))
-                    # 猜想：swap
                     self.flatten_entity(target_record, identity, entity, e)
                 else:
                     group[group_index] = None
@@ -102,9 +101,7 @@ def merge_topics_if_possible(
         outbound_depth = len(outbound)
 
     protected = outbound[outbound_depth:]
-    unprotected = outbound[:outbound_depth]
-    outbound.clear()
-    outbound.extend(unprotected)
+    outbound[outbound_depth:] = []
 
     topic_pair_records: dict[Topic, list[Any]] = {}
 
