@@ -6,7 +6,7 @@ from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
 from rye.operators import is_implemented, isolate_layout, layout, using_sync
-from rye.overloads import SimpleOverload, TypeOverload
+from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
 
@@ -96,8 +96,8 @@ with using_sync(TestPerformAlt()):
 
     debug(layout())
 
-    b = TestPerform.test.callee(str)
+    b = TestPerform.test(str)
     reveal_type(TestPerform.test)
-    c = TestPerform.test.callee(int)
+    c = TestPerform.test(int)
 
     print("??", repr(b), repr(c))

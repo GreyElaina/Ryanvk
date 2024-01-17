@@ -7,7 +7,7 @@ from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
 from rye.operators import is_implemented, isolate_layout, layout, using_sync
-from rye.overloads import SimpleOverload, TypeOverload
+from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
 

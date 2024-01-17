@@ -74,7 +74,7 @@ def instance_of(cls: type):
 
 @contextmanager
 def using_sync(*performs: BasePerform):
-    from rye.lifespan import AsyncLifespan, Lifespan
+    from rye.builtins.lifespan import AsyncLifespan, Lifespan
 
     with ExitStack() as stack:
         collection = [i.__collector__.artifacts for i in performs]
@@ -104,7 +104,7 @@ def using_sync(*performs: BasePerform):
 
 @asynccontextmanager
 async def using_async(*performs: BasePerform):
-    from rye.lifespan import AsyncLifespan, Lifespan
+    from rye.builtins.lifespan import AsyncLifespan, Lifespan
 
     async with AsyncExitStack() as stack:
         collections = [i.__collector__.artifacts for i in performs]
