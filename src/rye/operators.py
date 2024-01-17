@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, MutableSequence, overload
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Mapping, MutableSequence, overload
 
 from rye._runtime import AccessStack, GlobalArtifacts, Instances, Layout
 from rye.fn.record import FnImplement
@@ -62,10 +62,32 @@ def provide(*instances_: Any):
         raise RuntimeError("provide() can only be used when instances available")
 
     old_values = {type_: context_value[type_] for instance in instances_ if (type_ := type(instance)) in context_value}
+    non_existed = [type(instance) for instance in instances_ if type(instance) not in context_value]
 
     context_value.update({type(instance): instance for instance in instances_})
     yield
     context_value.update(old_values)
+    
+    for key_to_remove in non_existed:
+        context_value.pop(key_to_remove, None)
+
+
+@contextmanager
+def provide_unsafe(bindings: Mapping[type, Any]):
+
+    context_value = instances()
+    if context_value is None:
+        raise RuntimeError("provide() can only be used when instances available")
+
+    old_values = {type_: context_value[type_] for instance in bindings if (type_ := type(instance)) in context_value}
+    non_existed =  [key for key in bindings if key not in context_value]
+
+    context_value.update(bindings)
+    yield
+    context_value.update(old_values)
+
+    for key_to_remove in non_existed:
+        context_value.pop(key_to_remove, None)
 
 
 def instance_of(cls: type):

@@ -1,2 +1,2 @@
 line-length = 120
-extend-select = ["I", "F401"]
+extend-select = ["I", "F401", "TID252"]
