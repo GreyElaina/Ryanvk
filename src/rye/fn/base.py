@@ -91,3 +91,7 @@ class Fn(Generic[collectShape, callShape], BaseEntity):
     @property
     def callee(self):
         return callee_of(self)
+
+    @property
+    def __call__(self):
+        return self.callee
