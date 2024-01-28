@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Type
 
 from rye.fn.overload import FnOverload
 from rye.typing import Twin
@@ -12,7 +12,7 @@ class SimpleOverloadSignature:
     value: Any
 
 
-class SimpleOverload(FnOverload[SimpleOverloadSignature, type[Any], Any]):
+class SimpleOverload(FnOverload[SimpleOverloadSignature, Any, Any]):
     def digest(self, collect_value: Any) -> SimpleOverloadSignature:
         return SimpleOverloadSignature(collect_value)
 
@@ -40,7 +40,7 @@ class TypeOverloadSignature:
     type: type[Any]
 
 
-class TypeOverload(FnOverload[TypeOverloadSignature, type[Any], Any]):
+class TypeOverload(FnOverload[TypeOverloadSignature, Type[Any], Any]):
     def digest(self, collect_value: type) -> TypeOverloadSignature:
         return TypeOverloadSignature(collect_value)
 
