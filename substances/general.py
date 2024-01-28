@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Protocol, TypeVar, reveal_type
 
 from rye._runtime import GlobalArtifacts
+from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
 from rye.operators import is_implemented, isolate_layout, layout, using_sync
-from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.topic import merge_topics_if_possible
 from rye.typing import FnComposeCallReturnType
 
@@ -46,7 +46,7 @@ reveal_type(TestPerform.test)
 reveal_type(TestPerform.test.implements)
 reveal_type(TestPerform.test.implements(type=str))
 reveal_type(TestPerform.test1)
-
+reveal_type(TestPerform.test1.implements)
 
 class TestPerformAlt((n := BaseCollector())._):
     @n.collect

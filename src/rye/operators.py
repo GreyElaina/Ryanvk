@@ -2,24 +2,26 @@ from __future__ import annotations
 
 from collections import ChainMap
 from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Mapping, MutableSequence, overload
+from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, Mapping, overload
 
-from rye._runtime import AccessStack, GlobalArtifacts, Instances, Layout
-from rye.fn.record import FnImplement
-from rye.layout import DetailedArtifacts
-from rye.topic import merge_topics_if_possible
-from rye.typing import R1, P, Q, R, inTC
-from rye.utils import standalone_context
+from typing_extensions import Concatenate
+
+from ._runtime import AccessStack, GlobalLayout, Instances, Layout
+from .fn.record import FnImplement
+from .layout import ArtifactMirror, DetailedArtifacts, LayoutT
+from .topic import merge_topics_if_possible
+from .typing import R1, P, Q, R, inTC
+from .utils import standalone_context
 
 if TYPE_CHECKING:
-    from rye._capability import CapabilityPerform
-    from rye.fn import Fn
-    from rye.fn.record import FnRecord
-    from rye.perform import BasePerform
+    from ._capability import CapabilityPerform
+    from .fn import Fn
+    from .fn.record import FnRecord
+    from .perform import BasePerform
 
 
 @standalone_context
-def iter_artifacts(key: Any | None = None):
+def iter_artifacts(key: Any | None = None) -> Generator[Mapping[Any, Any], None, None]:
     collection = AccessStack.get(None)
     if collection is None:
         collection = {}
@@ -36,15 +38,18 @@ def iter_artifacts(key: Any | None = None):
     start_offset = index + 1
     try:
         for stack[-1], content in enumerate(layout()[start_offset:], start=start_offset):
-            yield content
+            if isinstance(content, ArtifactMirror):
+                yield from content.mirrors_target()
+            else:
+                yield content
     finally:
         stack.pop()
         if not stack:
             collection.pop(key, None)
 
 
-def layout() -> MutableSequence[DetailedArtifacts[Any, Any]]:
-    return Layout.get(None) or [GlobalArtifacts]
+def layout() -> LayoutT:
+    return Layout.get(None) or GlobalLayout
 
 
 def shallow():
@@ -67,20 +72,19 @@ def provide(*instances_: Any):
     context_value.update({type(instance): instance for instance in instances_})
     yield
     context_value.update(old_values)
-    
+
     for key_to_remove in non_existed:
         context_value.pop(key_to_remove, None)
 
 
 @contextmanager
 def provide_unsafe(bindings: Mapping[type, Any]):
-
     context_value = instances()
     if context_value is None:
         raise RuntimeError("provide() can only be used when instances available")
 
     old_values = {type_: context_value[type_] for instance in bindings if (type_ := type(instance)) in context_value}
-    non_existed =  [key for key in bindings if key not in context_value]
+    non_existed = [key for key in bindings if key not in context_value]
 
     context_value.update(bindings)
     yield
@@ -96,7 +100,7 @@ def instance_of(cls: type):
 
 @contextmanager
 def using_sync(*performs: BasePerform):
-    from rye.builtins.lifespan import AsyncLifespan, Lifespan
+    from .builtins.lifespan import AsyncLifespan, Lifespan
 
     with ExitStack() as stack:
         collection = [i.__collector__.artifacts for i in performs]
@@ -126,7 +130,7 @@ def using_sync(*performs: BasePerform):
 
 @asynccontextmanager
 async def using_async(*performs: BasePerform):
-    from rye.builtins.lifespan import AsyncLifespan, Lifespan
+    from .builtins.lifespan import AsyncLifespan, Lifespan
 
     async with AsyncExitStack() as stack:
         collections = [i.__collector__.artifacts for i in performs]
@@ -165,8 +169,8 @@ class _WrapGenerator(Generic[R, Q, R1]):
 
 
 def callee_of(target: Fn[Any, inTC] | FnImplement) -> inTC:
-    from rye.fn import Fn
-    from rye.fn.compose import EntitiesHarvest
+    from .fn import Fn
+    from .fn.compose import EntitiesHarvest
 
     def wrapper(*args, **kwargs) -> Any:
         if isinstance(target, Fn):
@@ -261,7 +265,7 @@ def isolate_layout(backwards_protect: bool = True):
 
     protected = []
     if backwards_protect:
-        protected = [i for i in upstream if not i.protected]
+        protected = [i for i in upstream if isinstance(i, DetailedArtifacts) and not i.protected]
 
     for protect_target in protected:
         protect_target.protected = True
