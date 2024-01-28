@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Generic, cast, overload
 
-try:
+if sys.version_info >= (3, 11):
     from typing import Concatenate, Self
-except ImportError:
+else:
     from typing_extensions import Concatenate, Self
 
 from rye._capability import CapabilityPerform

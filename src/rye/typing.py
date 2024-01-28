@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -9,15 +10,10 @@ from typing import (
     TypeVar,
 )
 
-try:
-    from typing import ParamSpec
-except ImportError:
-    from typing_extensions import ParamSpec
-
-try:
-    from typing import TypeAlias
-except ImportError:
-    from typing_extensions import TypeAlias
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec, TypeAlias
+else:
+    from typing_extensions import ParamSpec, TypeAlias
 
 if TYPE_CHECKING:
     from rye.collector import BaseCollector

@@ -1,7 +1,7 @@
 {
     "exclude": [".venv"],
     "reportShadowedImports": false,
-    "pythonVersion": "3.11",
+    "pythonVersion": "3.8",
     "venv": ".venv",
     "venvPath": ".",
     "typeCheckingMode": "basic",

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import sys
 from typing import Any, Generic, TypeVar, overload
 
-try:
+if sys.version_info >= (3, 11):
     from typing import Self
-except ImportError:
+else:
     from typing_extensions import Self
 
 from rye.operators import instance_of

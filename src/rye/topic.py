@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import sys
 from itertools import cycle
 from typing import Any, Generic, Iterable, MutableMapping, MutableSequence, TypeVar
 
-from typing_extensions import Self
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 from .layout import DetailedArtifacts, LayoutT
 

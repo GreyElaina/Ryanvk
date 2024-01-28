@@ -1,5 +1,5 @@
 [project]
-name = "rye"
+name = "ryanvk-rye"
 version = "0.1.0"
 description = ""
 authors = [
@@ -9,7 +9,7 @@ dependencies = [
     # typing-extensions for python <= 3.11, for NotRequired
     "typing-extensions; python_version < '3.11'",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
 

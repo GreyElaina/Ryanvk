@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import sys
 from collections import ChainMap
 from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextmanager
 from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, Mapping, overload
 
-from typing_extensions import Concatenate
+if sys.version_info >= (3, 11):
+    from typing import Concatenate
+else:
+    from typing_extensions import Concatenate
 
 from ._runtime import AccessStack, GlobalLayout, Instances, Layout
 from .fn.record import FnImplement

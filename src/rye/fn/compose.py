@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import sys
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ContextManager, Final, Generic, Iterable, Self, overload
+from typing import TYPE_CHECKING, Any, Callable, ContextManager, Final, Generic, Iterable, overload
+
+if sys.version_info >= (3, 11):
+    from typing import Concatenate, Self
+else:
+    from typing_extensions import Concatenate, Self
 
 from rye.builtins.overloads import SingletonOverload
 from rye.fn.record import FnImplement

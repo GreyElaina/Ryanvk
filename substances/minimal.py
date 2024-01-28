@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from typing import Protocol, TypeVar, reveal_type
+from typing import Protocol, TypeVar
 
+from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
 from rye.fn.compose import FnCompose
-from rye.operators import instances, is_implemented, isolate_layout, layout, using_sync
-from rye.builtins.overloads import SimpleOverload, TypeOverload
-from rye.topic import merge_topics_if_possible
+from rye.operators import instances, layout, using_sync
 from rye.typing import FnComposeCallReturnType
+from typing_extensions import reveal_type
 
 m = BaseCollector()
 T = TypeVar("T")

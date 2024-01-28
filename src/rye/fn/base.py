@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Concatenate, Generic, Protocol, TypeVar
+import sys
+from typing import Any, Callable, Generic, Protocol, TypeVar
+
+if sys.version_info >= (3, 11):
+    from typing import Concatenate
+else:
+    from typing_extensions import Concatenate
 
 from rye.entity import BaseEntity
 from rye.fn.compose import FnCompose

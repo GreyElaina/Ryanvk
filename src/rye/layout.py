@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import sys
 from collections import UserDict
 from typing import Any, Iterable, Mapping, MutableMapping, MutableSequence, Protocol, TypeVar, runtime_checkable
 
-from typing_extensions import TypeAlias
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
 _K = TypeVar("_K")
 _V = TypeVar("_V")

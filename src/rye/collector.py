@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import sys
 from typing import Any, Callable, MutableMapping, TypeVar
 
-from typing_extensions import Self
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 
 from .perform import BasePerform
 from .typing import P, R, SupportsCollect
