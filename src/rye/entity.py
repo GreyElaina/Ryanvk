@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, final
-
-try:
-    from typing import NotRequired, TypedDict
-except ImportError:
-    from typing_extensions import NotRequired, TypedDict
+from typing import Any, TypedDict, final
 
 from rye.collector import BaseCollector
 from rye.perform import BasePerform
 
 
-class EntityAssignInfo(TypedDict):
-    cls: NotRequired[type]
-    name: NotRequired[str]
-    annotation: NotRequired[Any]
+class EntityAssignInfo(TypedDict, total=False):
+    cls: type
+    name: str
+    annotation: Any
 
 
 class BaseEntity:
