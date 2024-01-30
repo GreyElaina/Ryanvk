@@ -150,7 +150,7 @@ def _subclass_gen(cls: type):
         yield from _subclass_gen(subcls)
 
 
-def diff_perform_subtypes(generate: Callable[P, Generator[BasePerform, None, None]]) -> Callable[P, ]:
+def diff_perform_subtypes(generate: Callable[P, Generator[BasePerform, None, None]]):
     def wrapper(*args: P.args, **kwargs: P.kwargs):
         before = list(_subclass_gen(BasePerform))
         manually = list(generate(*args, **kwargs))
