@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from collections import ChainMap
 from contextlib import AsyncExitStack, ExitStack, asynccontextmanager, contextmanager
+from itertools import islice
 from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, Mapping, overload
 
 if sys.version_info >= (3, 11):
@@ -24,6 +25,14 @@ if TYPE_CHECKING:
     from .perform import BasePerform
 
 
+def _iter_layout(source: LayoutT | None = None) -> Generator[DetailedArtifacts[Any, Any], None, None]:
+    for content in source or layout():
+        if isinstance(content, ArtifactMirror):
+            yield from _iter_layout(content.mirror_targets())
+        else:
+            yield content
+
+
 @standalone_context
 def iter_artifacts(key: Any | None = None) -> Generator[Mapping[Any, Any], None, None]:
     collection = AccessStack.get(None)
@@ -35,17 +44,14 @@ def iter_artifacts(key: Any | None = None) -> Generator[Mapping[Any, Any], None,
         stack = collection[key] = [-1]
     else:
         stack = collection[key]
-
+    
     index = stack[-1]
     stack.append(index)
 
     start_offset = index + 1
     try:
-        for stack[-1], content in enumerate(layout()[start_offset:], start=start_offset):
-            if isinstance(content, ArtifactMirror):
-                yield from content.mirrors_target()
-            else:
-                yield content
+        for stack[-1], content in enumerate(islice(_iter_layout(), start_offset, None), start=start_offset):
+            yield content
     finally:
         stack.pop()
         if not stack:
@@ -103,7 +109,7 @@ def instance_of(cls: type):
 
 
 @contextmanager
-def using_sync(*performs: BasePerform):
+def using_sync(*performs: BasePerform, ):
     from .builtins.lifespan import AsyncLifespan, Lifespan
 
     with ExitStack() as stack:
@@ -131,6 +137,29 @@ def using_sync(*performs: BasePerform):
 
         yield stack
 
+
+def build_layout(*performs: BasePerform):
+    output: LayoutT = [DetailedArtifacts()]  # type: ignore
+    merge_topics_if_possible([i.__collector__.artifacts for i in performs], output)
+    return output
+
+
+def _subclass_gen(cls: type):
+    for subcls in cls.__subclasses__():
+        yield subcls
+        yield from _subclass_gen(subcls)
+
+
+def diff_perform_subtypes(generate: Callable[P, Generator[BasePerform, None, None]]) -> Callable[P, ]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
+        before = list(_subclass_gen(BasePerform))
+        manually = list(generate(*args, **kwargs))
+        after = list(_subclass_gen(BasePerform))
+        append = [i for i in after + manually if i not in before]
+        append = list(dict.fromkeys(append))
+        return append
+    return wrapper
+    
 
 @asynccontextmanager
 async def using_async(*performs: BasePerform):

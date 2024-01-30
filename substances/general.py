@@ -90,7 +90,6 @@ class TestPerformAlt2((n := BaseCollector())._):
 
 # a = Staff([TestPerformAlt.__collector__.artifacts], {})
 
-
 with using_sync(TestPerformAlt2(), TestPerformAlt1(), TestPerformAlt()):
     from devtools import debug
 

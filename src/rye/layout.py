@@ -2,7 +2,14 @@ from __future__ import annotations
 
 import sys
 from collections import UserDict
-from typing import Any, Iterable, Mapping, MutableMapping, MutableSequence, Protocol, TypeVar, runtime_checkable
+from typing import (
+    Any,
+    MutableMapping,
+    MutableSequence,
+    Protocol,
+    TypeVar,
+    runtime_checkable,
+)
 
 if sys.version_info >= (3, 10):
     from typing import TypeAlias
@@ -19,9 +26,9 @@ class DetailedArtifacts(UserDict, MutableMapping[_K, _V]):
 
 @runtime_checkable
 class ArtifactMirror(Protocol):
-    def mirrors_target(self) -> Iterable[Mapping[Any, Any]]:
+    def mirror_targets(self) -> LayoutT:
         ...
 
 
 LayoutContentT: TypeAlias = "ArtifactMirror | DetailedArtifacts[Any, Any]"
-LayoutT: TypeAlias = "MutableSequence[LayoutContentT]"
+LayoutT: TypeAlias = "MutableSequence[LayoutContentT] | list[LayoutContentT]"
