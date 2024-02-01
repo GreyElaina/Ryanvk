@@ -1,10 +1,11 @@
-from ._capability import capability as capability  # noqa: I001
+from ._capability import capability as capability
 from .collector import BaseCollector as BaseCollector
 from .fn import Fn as Fn
 from .fn import FnCompose as FnCompose
 from .fn import FnImplement as FnImplement
 from .fn import FnImplementEntity as FnImplementEntity
 from .fn import FnOverload as FnOverload
+from .operators import build_layout as build_layout
 from .operators import callee_of as callee_of
 from .operators import instances as instances
 from .operators import is_implemented as is_implemented
@@ -20,11 +21,14 @@ from .topic import Topic as Topic
 from .topic import merge_topics_if_possible as merge_topics_if_possible
 from .utils import standalone_context as standalone_context
 
-# Builtins
+object()
 
+# Builtins
+# ruff: noqa: E402
+
+from .builtins.fn import AsyncLifespan as AsyncLifespan
+from .builtins.fn import Lifespan as Lifespan
 from .builtins.instance_of import InstanceOf as InstanceOf
-from .builtins.lifespan import Lifespan as Lifespan
-from .builtins.lifespan import AsyncLifespan as AsyncLifespan
 from .builtins.overloads import SimpleOverload as SimpleOverload
 from .builtins.overloads import SingletonOverload as SingletonOverload
 from .builtins.overloads import TypeOverload as TypeOverload

@@ -44,7 +44,7 @@ def iter_artifacts(key: Any | None = None) -> Generator[Mapping[Any, Any], None,
         stack = collection[key] = [-1]
     else:
         stack = collection[key]
-    
+
     index = stack[-1]
     stack.append(index)
 
@@ -109,8 +109,10 @@ def instance_of(cls: type):
 
 
 @contextmanager
-def using_sync(*performs: BasePerform, ):
-    from .builtins.lifespan import AsyncLifespan, Lifespan
+def using_sync(
+    *performs: BasePerform,
+):
+    from .builtins.fn import AsyncLifespan, Lifespan
 
     with ExitStack() as stack:
         collection = [i.__collector__.artifacts for i in performs]
@@ -138,32 +140,15 @@ def using_sync(*performs: BasePerform, ):
         yield stack
 
 
-def build_layout(*performs: BasePerform):
+def build_layout(*performs: BasePerform | type[BasePerform]):
     output: LayoutT = [DetailedArtifacts()]  # type: ignore
     merge_topics_if_possible([i.__collector__.artifacts for i in performs], output)
     return output
 
 
-def _subclass_gen(cls: type):
-    for subcls in cls.__subclasses__():
-        yield subcls
-        yield from _subclass_gen(subcls)
-
-
-def diff_perform_subtypes(generate: Callable[P, Generator[BasePerform, None, None]]):
-    def wrapper(*args: P.args, **kwargs: P.kwargs):
-        before = list(_subclass_gen(BasePerform))
-        manually = list(generate(*args, **kwargs))
-        after = list(_subclass_gen(BasePerform))
-        append = [i for i in after + manually if i not in before]
-        append = list(dict.fromkeys(append))
-        return append
-    return wrapper
-    
-
 @asynccontextmanager
 async def using_async(*performs: BasePerform):
-    from .builtins.lifespan import AsyncLifespan, Lifespan
+    from .builtins.fn import AsyncLifespan, Lifespan
 
     async with AsyncExitStack() as stack:
         collections = [i.__collector__.artifacts for i in performs]

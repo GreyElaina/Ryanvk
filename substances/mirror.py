@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, TypeVar
 
-from rye._runtime import AccessStack, GlobalArtifacts, IteratingKey
+from rye._runtime import AccessStack, GlobalArtifacts
 from rye.builtins.overloads import SimpleOverload, TypeOverload
 from rye.collector import BaseCollector
 from rye.fn.base import Fn
@@ -47,10 +47,7 @@ class TestPerformAlt((n := BaseCollector())._):
 
 
 class TestMirror:
-    def mirror_iter_key(self):
-        return "balabala"
-
-    def mirrors_target(self) -> LayoutT:
+    def mirror_targets(self) -> LayoutT:
         return [DetailedArtifacts({1: 1}), DetailedArtifacts({2: 2}), DetailedArtifacts({3: 3})]
 
 
@@ -76,4 +73,3 @@ with isolate_layout():
         if 2 in i:
             for ii in iter_artifacts():
                 print("p", ii)
-            
